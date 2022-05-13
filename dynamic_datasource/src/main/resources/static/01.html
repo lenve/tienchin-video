@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="jquery-3.6.0.js"></script>
+</head>
+<body>
+<div>
+    请选择数据源：
+    <select name="" id="" onchange="dsChange(this.options[this.options.selectedIndex].value)">
+        <option value="请选择">请选择</option>
+        <option value="master">master</option>
+        <option value="slave">slave</option>
+    </select>
+</div>
+<div id="result">
+
+</div>
+
+<button onclick="loadData()">加载数据</button>
+
+<script>
+    function loadData() {
+        $.get("/users",function (data) {
+            $("#result").html(JSON.stringify(data));
+        })
+    }
+    function dsChange(value) {
+        $.post("/dstype",{dsType: value})
+    }
+</script>
+</body>
+</html>
