@@ -8,6 +8,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.javaboy.dd.DynamicDatasourceApplication;
 import org.javaboy.dd.annotation.DataSource;
 import org.javaboy.dd.datasource.DynamicDataSourceContextHolder;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Aspect
-@Order(11)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class DataSourceAspect {
 
     /**

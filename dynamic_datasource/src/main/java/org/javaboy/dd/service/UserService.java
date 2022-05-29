@@ -5,6 +5,7 @@ import org.javaboy.dd.mapper.UserMapper;
 import org.javaboy.dd.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,7 +23,8 @@ public class UserService {
     @Autowired
     UserMapper userMapper;
 
-    @DataSource("master")
+    @DataSource("slave")
+    @Transactional
     public List<User> getAllUsers() {
         return userMapper.getAllUsers();
     }

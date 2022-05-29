@@ -33,7 +33,8 @@ public class LoadDataSource {
         try {
             Set<String> keySet = ds.keySet();
             for (String key : keySet) {
-                map.put(key, druidProperties.dataSource((DruidDataSource) DruidDataSourceFactory.createDataSource(ds.get(key))));
+                DataSource dataSource = druidProperties.dataSource((DruidDataSource) DruidDataSourceFactory.createDataSource(ds.get(key)));
+                map.put(key, dataSource);
             }
         } catch (Exception e) {
             e.printStackTrace();
