@@ -53,3 +53,13 @@ spring:
       wall:
         config:
           multi-statement-allow: true
+  cloud:
+    alibaba:
+      seata:
+        tx-service-group: my_test_tx_group
+  main:
+    allow-circular-references: true
+  application:
+    name: dd
+seata:
+  enable-auto-data-source-proxy: false

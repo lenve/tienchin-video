@@ -14,6 +14,11 @@ class DynamicDatasourceApplicationTests {
     @Autowired
     UserService userService;
 
+    @Test
+    void test01() {
+        userService.test();
+    }
+
 
     @Test
     void contextLoads() {

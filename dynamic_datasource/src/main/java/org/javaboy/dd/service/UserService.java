@@ -1,5 +1,6 @@
 package org.javaboy.dd.service;
 
+import io.seata.spring.annotation.GlobalTransactional;
 import org.javaboy.dd.annotation.DataSource;
 import org.javaboy.dd.mapper.UserMapper;
 import org.javaboy.dd.model.User;
@@ -22,6 +23,18 @@ import java.util.List;
 public class UserService {
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    MasterService masterService;
+    @Autowired
+    SlaveService slaveService;
+
+//    @Transactional
+    @GlobalTransactional
+    public void test() {
+        masterService.updateUserAge("zhangsan",200);
+        slaveService.updateUserAge("javaboy", 200);
+    }
 
     @DataSource("slave")
     @Transactional

@@ -21,9 +21,9 @@ import javax.servlet.http.HttpSession;
  * @GitHub https://github.com/lenve
  * @Gitee https://gitee.com/lenve
  */
-@Aspect
-@Component
-@Order(10)
+//@Aspect
+//@Component
+//@Order(10)
 public class GloalDataSourceAspect {
 
     @Autowired

@@ -37,7 +37,7 @@ public class DataSourceAspect {
     }
 
     @Around("pc()")
-    public Object around(ProceedingJoinPoint pjp) {
+    public Object around(ProceedingJoinPoint pjp) throws Throwable {
         //获取方法上面的有效注解
         DataSource dataSource = getDataSource(pjp);
         if (dataSource != null) {
@@ -49,10 +49,10 @@ public class DataSourceAspect {
             return pjp.proceed();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
+            throw throwable;
         } finally {
             DynamicDataSourceContextHolder.clearDataSourceType();
         }
-        return null;
     }
 
     private DataSource getDataSource(ProceedingJoinPoint pjp) {

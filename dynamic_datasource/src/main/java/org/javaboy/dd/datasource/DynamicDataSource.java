@@ -1,5 +1,6 @@
 package org.javaboy.dd.datasource;
 
+import io.seata.rm.datasource.DataSourceProxy;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,7 @@ public class DynamicDataSource extends AbstractRoutingDataSource {
 
     public DynamicDataSource(LoadDataSource loadDataSource) {
         //1.设置所有的数据源
-        Map<String, DataSource> allDs = loadDataSource.loadAllDataSource();
+        Map<String, DataSourceProxy> allDs = loadDataSource.loadAllDataSource();
         super.setTargetDataSources(new HashMap<>(allDs));
         //2.设置默认的数据源
         //将来，并不是所有的方法上都有 @DataSource 注解，对于那些没有 @DataSource 注解的方法，该使用哪个数据源？
