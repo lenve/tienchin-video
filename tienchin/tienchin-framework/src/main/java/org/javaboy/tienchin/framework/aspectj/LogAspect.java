@@ -41,6 +41,7 @@ public class LogAspect {
     /**
      * 处理完请求后执行
      *
+     * ssm
      * @param joinPoint 切点
      */
     @AfterReturning(pointcut = "@annotation(controllerLog)", returning = "jsonResult")
@@ -80,14 +81,16 @@ public class LogAspect {
                 operLog.setErrorMsg(StringUtils.substring(e.getMessage(), 0, 2000));
             }
             // 设置方法名称
-            String className = joinPoint.getTarget().getClass().getName();
-            String methodName = joinPoint.getSignature().getName();
-            operLog.setMethod(className + "." + methodName + "()");
+//            String className = joinPoint.getTarget().getClass().getName();
+//            String methodName = joinPoint.getSignature().getName();
+            //获取方法的名称
+            String methodName = joinPoint.getSignature().toLongString().split(" ")[2];
+            operLog.setMethod(methodName);
             // 设置请求方式
             operLog.setRequestMethod(ServletUtils.getRequest().getMethod());
             // 处理设置注解上的参数
             getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
-            // 保存数据库
+            // 保存数据库，异步操作
             AsyncManager.me().execute(AsyncFactory.recordOper(operLog));
         } catch (Exception exp) {
             // 记录本地异常日志
@@ -131,9 +134,13 @@ public class LogAspect {
     private void setRequestValue(JoinPoint joinPoint, SysOperLog operLog) throws Exception {
         String requestMethod = operLog.getRequestMethod();
         if (HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod)) {
+            //参数放在请求体里边的情况
+            //如果请求参数是在地址栏中，请求参数主要就是 key-value，如果请求参数在请求体中，那么可能会存在二进制的参数
             String params = argsArrayToString(joinPoint.getArgs());
             operLog.setOperParam(StringUtils.substring(params, 0, 2000));
         } else {
+            //参数放在地址栏的情况
+            //提取地址栏中的参数
             Map<?, ?> paramsMap = (Map<?, ?>) ServletUtils.getRequest().getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
             operLog.setOperParam(StringUtils.substring(paramsMap.toString(), 0, 2000));
         }
@@ -160,6 +167,8 @@ public class LogAspect {
 
     /**
      * 判断是否需要过滤的对象。
+     *
+     * 上传文件对象、集合中保存了文件上传对象、Map 中保存了文件上传对象、HttpServletRequest、HttpServletResponse、BindingResult
      *
      * @param o 对象信息。
      * @return 如果是需要过滤的对象，则返回true；否则返回false。

@@ -11,6 +11,7 @@
 |20220603|[v20220603](https://github.com/lenve/tienchin-video/archive/refs/tags/v20220603.zip)|
 |20220611|[v20220611](https://github.com/lenve/tienchin-video/archive/refs/tags/v20220611.zip)|
 |20220619|[v20220619](https://github.com/lenve/tienchin-video/archive/refs/tags/v20220619.zip)|
+|20220625|[v20220625](https://github.com/lenve/tienchin-video/archive/refs/tags/v20220625.zip)|
 |||
 
 ---
