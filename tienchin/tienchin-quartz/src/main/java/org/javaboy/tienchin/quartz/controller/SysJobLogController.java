@@ -67,7 +67,7 @@ public class SysJobLogController extends BaseController {
     /**
      * 删除定时任务调度日志
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:remove')")
+    @PreAuthorize("hasPermission('monitor:job:remove')")
     @Log(title = "定时任务调度日志", businessType = BusinessType.DELETE)
     @DeleteMapping("/{jobLogIds}")
     public AjaxResult remove(@PathVariable Long[] jobLogIds) {
@@ -77,7 +77,7 @@ public class SysJobLogController extends BaseController {
     /**
      * 清空定时任务调度日志
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:remove')")
+    @PreAuthorize("hasPermission('monitor:job:remove')")
     @Log(title = "调度日志", businessType = BusinessType.CLEAN)
     @DeleteMapping("/clean")
     public AjaxResult clean() {
