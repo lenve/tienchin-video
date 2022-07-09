@@ -13,6 +13,7 @@
 |20220619|[v20220619](https://github.com/lenve/tienchin-video/archive/refs/tags/v20220619.zip)|
 |20220625|[v20220625](https://github.com/lenve/tienchin-video/archive/refs/tags/v20220625.zip)|
 |20220702|[v20220702](https://github.com/lenve/tienchin-video/archive/refs/tags/v20220702.zip)|
+|20220709|[v20220709](https://github.com/lenve/tienchin-video/archive/refs/tags/v20220709.zip)|
 |||
 
 ---
@@ -89,7 +90,6 @@
 ├── 【号外019】.分布式事务seata-xa模式实战-1.mp4
 ├── 【号外020】.分布式事务seata-xa模式实战-2.mp4
 ├── 【号外021】.分布式事务总结-1.mp4
-├── 【号外022】.分布式事务总结-2 copy.mp4
 └── 【号外022】.分布式事务总结-2.mp4
 ```
 

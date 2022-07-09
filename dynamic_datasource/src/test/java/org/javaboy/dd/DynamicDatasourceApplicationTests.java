@@ -22,7 +22,7 @@ class DynamicDatasourceApplicationTests {
 
     @Test
     void contextLoads() {
-        List<User> list = userService.getAllUsers();
+        List<User> list = userService.getAllUsers2();
         for (User user : list) {
             System.out.println(user);
         }

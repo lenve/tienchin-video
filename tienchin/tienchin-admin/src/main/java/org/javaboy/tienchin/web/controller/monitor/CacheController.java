@@ -27,7 +27,7 @@ public class CacheController {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    @PreAuthorize("@ss.hasPermi('monitor:cache:list')")
+    @PreAuthorize("hasPermission('monitor:cache:list')")
     @GetMapping()
     public AjaxResult getInfo() throws Exception {
         Properties info = (Properties) redisTemplate.execute((RedisCallback<Object>) connection -> connection.info());

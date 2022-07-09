@@ -1,5 +1,7 @@
 package org.javaboy.tienchin.framework.config;
 
+import org.javaboy.tienchin.common.config.TienChinConfig;
+import org.javaboy.tienchin.common.constant.Constants;
 import org.javaboy.tienchin.framework.interceptor.RepeatSubmitInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,8 +12,6 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.javaboy.tienchin.common.config.TienChinConfig;
-import org.javaboy.tienchin.common.constant.Constants;
 
 /**
  * 通用配置
@@ -62,6 +62,11 @@ public class ResourcesConfig implements WebMvcConfigurer {
         source.registerCorsConfiguration("/**", config);
         // 返回新的CorsFilter
         return new CorsFilter(source);
+    }
+
+    @Bean
+    CustomMethodSecurityExpressionHandler customMethodSecurityExpressionHandler() {
+        return new CustomMethodSecurityExpressionHandler();
     }
 
 }

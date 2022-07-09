@@ -34,7 +34,7 @@ public class SysJobLogController extends BaseController {
     /**
      * 查询定时任务调度日志列表
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:list')")
+    @PreAuthorize("hasPermission('monitor:job:list')")
     @GetMapping("/list")
     public TableDataInfo list(SysJobLog sysJobLog) {
         startPage();
@@ -45,7 +45,7 @@ public class SysJobLogController extends BaseController {
     /**
      * 导出定时任务调度日志列表
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:export')")
+    @PreAuthorize("hasPermission('monitor:job:export')")
     @Log(title = "任务调度日志", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysJobLog sysJobLog) {
@@ -57,7 +57,7 @@ public class SysJobLogController extends BaseController {
     /**
      * 根据调度编号获取详细信息
      */
-    @PreAuthorize("@ss.hasPermi('monitor:job:query')")
+    @PreAuthorize("hasPermission('monitor:job:query')")
     @GetMapping(value = "/{configId}")
     public AjaxResult getInfo(@PathVariable Long jobLogId) {
         return AjaxResult.success(jobLogService.selectJobLogById(jobLogId));

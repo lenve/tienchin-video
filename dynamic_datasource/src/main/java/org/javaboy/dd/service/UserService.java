@@ -25,6 +25,9 @@ public class UserService {
     UserMapper userMapper;
 
     @Autowired
+    UserService userService;
+
+    @Autowired
     MasterService masterService;
     @Autowired
     SlaveService slaveService;
@@ -41,4 +44,8 @@ public class UserService {
     public List<User> getAllUsers() {
         return userMapper.getAllUsers();
     }
+    public List<User> getAllUsers2() {
+        return userService.getAllUsers();
+    }
+
 }

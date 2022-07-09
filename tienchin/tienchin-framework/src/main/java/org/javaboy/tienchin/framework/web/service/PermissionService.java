@@ -14,7 +14,7 @@ import org.springframework.util.CollectionUtils;
  *
  * @author tienchin
  */
-@Service("ss")
+//@Service("ss")
 public class PermissionService {
     /**
      * 所有权限标识
