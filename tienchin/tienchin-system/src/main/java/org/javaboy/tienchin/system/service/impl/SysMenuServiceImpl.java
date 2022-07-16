@@ -303,7 +303,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
      */
     public String getRouteName(SysMenu menu) {
         String routerName = StringUtils.capitalize(menu.getPath());
-        // 非外链并且是一级目录（类型为目录）
+        // 非外链并且是一级目录（类型为菜单）
         if (isMenuFrame(menu)) {
             routerName = StringUtils.EMPTY;
         }
