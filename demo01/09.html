@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    let p1 = Promise.resolve('javaboy');
+    let p2 = 88;
+    let p3 = new Promise((resolve, reject) => {
+        setTimeout(resolve, 3000, "hello javaboy");
+    })
+    Promise.all([p1,p2,p3]).then(data=>{
+        // p1\p2\p3 都是 resolve，就会进入到 then 中
+        console.log("data:", data);
+    }).catch(err=>{
+        //p1\p2\p3 有一个 reject，就会进入到 catch 中
+        console.error("err:", err);
+    })
+</script>
+</body>
+</html>

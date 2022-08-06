@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    $.ajax({
+        url:'/login',
+        data:loginForm,
+        success:function (data) {
+            //登录成功
+            $.ajax({
+                url:'/getInfo',
+                success:function (data) {
+                    //获取用户信息成功
+                    $.ajax({
+                        url:'/getMenus',
+                        success:function (data) {
+                            //获取动态菜单成功
+                        }
+                    })
+                }
+            })
+        }
+    })
+</script>
+</body>
+</html>

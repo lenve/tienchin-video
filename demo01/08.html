@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    function resolved() {
+        console.log("resolved")
+    }
+    function rejected(err) {
+        console.log("err:", err);
+    }
+
+    let p1 = Promise.reject("出错啦");
+    // p1.then(resolved, rejected);
+    p1.then(resolved).catch(rejected);
+</script>
+</body>
+</html>

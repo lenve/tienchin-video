@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+
+    /**
+     * 登录
+     * @param resolve
+     * @param reject
+     */
+    function login(resolve, reject) {
+        setTimeout(() => {
+            //生成一个随机数
+            let number = Math.random();
+            if (number > 0.5) {
+                //登录成功，利用 resolve 函数将登录成功的结果扔出去
+                resolve("login success");
+            } else {
+                //登录失败，利用 reject 函数将登录失败的结果扔出去
+                reject("login error")
+            }
+        }, 1000);
+    }
+
+    new Promise(login).then(data => {
+        //如果 login 将来执行成功（就是 resolve 方法抛出执行结果的时候）
+        console.log("then1:", data);
+        return data;
+    }).then(data=>{
+        console.log("then2:", data);
+        return data;
+    }).then(data=>{
+        // throw new Error("出错啦");
+    }).catch(err=>{
+        console.error("err1:", err);
+    }).finally(()=>{
+        console.log("over!")
+    }).then(()=>{
+        console.log("========")
+    })
+</script>
+</body>
+</html>

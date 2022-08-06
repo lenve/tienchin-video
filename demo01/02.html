@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+
+    /**
+     * 登录
+     * @param resolve
+     * @param reject
+     */
+    function login(resolve, reject) {
+        setTimeout(() => {
+            //生成一个随机数
+            let number = Math.random();
+            if (number > 0.5) {
+                //登录成功，利用 resolve 函数将登录成功的结果扔出去
+                resolve("login success");
+            } else {
+                //登录失败，利用 reject 函数将登录失败的结果扔出去
+                reject("login error")
+            }
+        }, 1000);
+    }
+
+    function getInfo(resolve, reject) {
+        setTimeout(() => {
+            //生成一个随机数
+            let number = Math.random();
+            if (number > 0.5) {
+                //登录成功，利用 resolve 函数将登录成功的结果扔出去
+                resolve("getInfo success");
+            } else {
+                //登录失败，利用 reject 函数将登录失败的结果扔出去
+                reject("getInfo error")
+            }
+        }, 1000);
+    }
+
+    function getMenus(resolve, reject) {
+        setTimeout(() => {
+            //生成一个随机数
+            let number = Math.random();
+            if (number > 0.5) {
+                //登录成功，利用 resolve 函数将登录成功的结果扔出去
+                resolve("getMenus success");
+            } else {
+                //登录失败，利用 reject 函数将登录失败的结果扔出去
+                reject("getMenus error")
+            }
+        }, 1000);
+    }
+
+    new Promise(login).then(data => {
+        //如果 login 将来执行成功（就是 resolve 方法抛出执行结果的时候）
+        console.log("login:", data);
+        return new Promise(getInfo);
+    }).then(data=>{
+        //getInfo 执行成功，会进入到这里
+        console.log("getInfo:", data);
+        return new Promise(getMenus);
+    }).then(data=>{
+        console.log("getMenus:", data);
+    }).catch(err=>{
+        //如果上面任意一个出异常了，都会进入到最近的 catch 代码块中
+        console.error("err:", err);
+    })
+</script>
+</body>
+</html>
