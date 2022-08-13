@@ -2,6 +2,8 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import My01 from "@/views/My01";
 import My02 from "@/views/My02";
+import My03 from "@/views/My03";
+import My04 from "@/views/My04";
 
 const routes = [
   {
@@ -16,6 +18,14 @@ const routes = [
     path: '/my02',
     name: 'My02',
     component: My02
+  },{
+    path: '/my03',
+    name: 'My03',
+    component: My03
+  },{
+    path: '/my04',
+    name: 'My04',
+    component: My04
   },
   {
     path: '/about',

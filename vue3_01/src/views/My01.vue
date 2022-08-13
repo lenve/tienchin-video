@@ -10,6 +10,9 @@
             return{
                 msg: "hello javaboy!"
             }
+        },
+        mounted() {
+            console.log("=====Vue2=====mounted()==========")
         }
     }
 </script>
