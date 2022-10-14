@@ -26,6 +26,71 @@ public class ActReTest {
     RepositoryService repositoryService;
     private static final Logger logger = LoggerFactory.getLogger(ActReTest.class);
 
+    /**
+     * 激活一个已经挂起的流程定义
+     *
+     * : ==>  Preparing: update ACT_RE_PROCDEF SET REV_ = ?, SUSPENSION_STATE_ = ? where ID_ = ? and REV_ = ?
+     * : ==> Parameters: 3(Integer), 1(Integer), leave:1:48375905-43e2-11ed-ba47-acde48001122(String), 2(Integer)
+     * : <==    Updates: 1
+     *
+     * 激活一个流程定义，本质上，其实就是将 ACT_RE_PROCDEF 表中相应记录的 SUSPENSION_STATE_ 字段的值改为 1
+     *
+     */
+    @Test
+    void test12() {
+        List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().list();
+        for (ProcessDefinition pd : list) {
+            repositoryService.activateProcessDefinitionById(pd.getId());
+            logger.info("{} 流程定义已经被激活", pd.getId());
+        }
+    }
+
+    /**
+     * 挂起一个流程定义
+     *
+     * 挂起的流程定义，是无法启动一个流程实例的
+     *
+     * 执行的 SQL 如下：
+     *
+     *
+     : ==>  Preparing: update ACT_RE_PROCDEF SET REV_ = ?, SUSPENSION_STATE_ = ? where ID_ = ? and REV_ = ?
+     : ==> Parameters: 2(Integer), 2(Integer), leave:1:48375905-43e2-11ed-ba47-acde48001122(String), 1(Integer)
+     : <==    Updates: 1
+
+     所以，挂起一个流程定义，本质上，其实就是修改 ACT_RE_PROCDEF 表中，对应的记录的 SUSPENSION_STATE_ 字段的状态值为 2
+     *
+     */
+    @Test
+    void test11() {
+        List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().list();
+        for (ProcessDefinition pd : list) {
+            //根据流程定义的 id 挂起一个流程定义
+            repositoryService.suspendProcessDefinitionById(pd.getId());
+            logger.info("{} 流程定义已经挂起",pd.getId());
+        }
+    }
+
+
+    /**
+     * 查看一个已经定义好的流程，是否是一个挂起状态
+     *
+     * 挂起的流程定义，是无法开启一个流程实例的
+     *
+     */
+    @Test
+    void test10() {
+        //查询所有的流程定义
+        List<ProcessDefinition> list = repositoryService.createProcessDefinitionQuery().list();
+        for (ProcessDefinition pd : list) {
+            //根据流程定义的 id 判断一个流程定义是否挂起
+            boolean processDefinitionSuspended = repositoryService.isProcessDefinitionSuspended(pd.getId());
+            if (processDefinitionSuspended) {
+                logger.info("流程定义 {} 已经挂起", pd.getId());
+            }else {
+                logger.info("流程定义 {} 没有挂起", pd.getId());
+            }
+        }
+    }
 
     /**
      * 删除一个流程部署
