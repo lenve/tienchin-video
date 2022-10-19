@@ -47,7 +47,7 @@ public class ProcessDeployController {
                 .name("JAVABOY的工作流")//ACT_RE_DEPLOYMENT 表中的 NAME_ 属性
                 .category("我的流程分类")//ACT_RE_DEPLOYMENT 表中的 CATEGORY_ 属性
                 .key("我的自定义的工作流的 KEY")//ACT_RE_DEPLOYMENT 表中的 KEY_ 属性
-                .tenantId(tenantId)
+//                .tenantId(tenantId)
                 //也可以用这个方法代替 addInputStream，但是注意，这个需要我们自己先去解析 IO 流程，将 XML 文件解析为一个字符串，然后就可以调用这个方法进行部署了
 //                .addString()
                 //设置文件的输入流程，将来通过这个输入流自动去读取 XML 文件
