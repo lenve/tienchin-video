@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 /**
  * @author 江南一点雨
@@ -31,6 +32,33 @@ public class ProcessDeployController {
     //RepositoryService 这个实体类可以用来操作 ACT_RE_XXX 这种表
     @Autowired
     RepositoryService repositoryService;
+
+
+    /**
+     * 部署带表单的流程
+     *
+     * 这种 HTML 表单，部署的时候需要跟流程一起部署，需要跟流程具备相同的部署 ID，否则，将来在流程运行的时候，就查询不到这个流程中所使用的外置表单
+     *
+     * 具体使用，就是将来部署流程的时候，同时上传该该流程的流程部署文件和该流程中所使用的外置表单
+     *
+     * @param files
+     * @return
+     */
+    @PostMapping("/deploywithform")
+    public RespBean deloyProcessWithForm(MultipartFile[] files) throws IOException {
+        DeploymentBuilder deploymentBuilder = repositoryService
+                //开始流程部署的构建
+                .createDeployment()
+                .name("JAVABOY的工作流")
+                .category("我的流程分类")
+                .key("我的自定义的工作流的 KEY");
+        for (MultipartFile file : files) {
+            deploymentBuilder.addInputStream(file.getOriginalFilename(), file.getInputStream());
+        }
+        //完成项目的部署
+        Deployment deployment = deploymentBuilder.deploy();
+        return RespBean.ok("部署成功", deployment.getId());
+    }
 
     /**
      * 这个就是我的流程部署接口，流程部署将来要上传一个文件，这个文件就是流程的 XML 文件
@@ -83,4 +111,22 @@ public class ProcessDeployController {
         Deployment deployment = deploymentBuilder.deploy();
         return RespBean.ok("部署成功", deployment.getId());
     }
+
+
+    @PostMapping("/deploy3")
+    public RespBean deploy3(MultipartFile file) throws IOException {
+        DeploymentBuilder deploymentBuilder = repositoryService
+                //开始流程部署的构建
+                .createDeployment()
+                .name("JAVABOY的工作流")//ACT_RE_DEPLOYMENT 表中的 NAME_ 属性
+                .category("我的流程分类")//ACT_RE_DEPLOYMENT 表中的 CATEGORY_ 属性
+                .key("我的自定义的工作流的 KEY")//ACT_RE_DEPLOYMENT 表中的 KEY_ 属性
+                //设置流程定义激活的时间，在到达这个时间点之前，这个流程定义是不可用的，到达这个时间点之后，就可以通过这个流程定义启动一个流程实例了
+                .activateProcessDefinitionsOn(new Date(System.currentTimeMillis() + 10 * 1000))
+                .addInputStream(file.getOriginalFilename(), file.getInputStream());
+        //完成项目的部署
+        Deployment deployment = deploymentBuilder.deploy();
+        return RespBean.ok("部署成功", deployment.getId());
+    }
+
 }
