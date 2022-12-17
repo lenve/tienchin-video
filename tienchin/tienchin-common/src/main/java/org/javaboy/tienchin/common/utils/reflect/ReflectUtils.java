@@ -152,6 +152,8 @@ public class ReflectUtils {
                         args[i] = Convert.toLong(args[i]);
                     } else if (cs[i] == Double.class) {
                         args[i] = Convert.toDouble(args[i]);
+                    }else if (cs[i] == Byte.class) {
+                        args[i] = Convert.toByte(args[i]);
                     } else if (cs[i] == Float.class) {
                         args[i] = Convert.toFloat(args[i]);
                     } else if (cs[i] == Date.class) {

@@ -24,6 +24,46 @@ public class AskForLeaveVO {
     private Date endTime;
     //请假的审批人
     private String approveUser;
+    private String processId;
+    private Boolean approval;
+
+    public AskForLeaveVO(Integer days, String reason, Date startTime, Date endTime, String approveUser, String processId, Boolean approval) {
+        this.days = days;
+        this.reason = reason;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.approveUser = approveUser;
+        this.processId = processId;
+        this.approval = approval;
+    }
+
+    public Boolean getApproval() {
+        return approval;
+    }
+
+    public void setApproval(Boolean approval) {
+        this.approval = approval;
+    }
+
+    public String getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(String processId) {
+        this.processId = processId;
+    }
+
+    public AskForLeaveVO() {
+    }
+
+    public AskForLeaveVO(Integer days, String reason, Date startTime, Date endTime, String approveUser,String processId) {
+        this.days = days;
+        this.reason = reason;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.approveUser = approveUser;
+        this.processId = processId;
+    }
 
     public Integer getDays() {
         return days;

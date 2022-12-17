@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.javaboy.tienchin.activity.mapper.ActivityMapper">
+
+    <select id="selectActivityList" resultType="org.javaboy.tienchin.activity.domain.vo.ActivityVO" parameterType="org.javaboy.tienchin.activity.domain.vo.ActivityVO">
+        select ta.*,tc.channel_name from tienchin_activity ta,tienchin_channel tc where tc.channel_id=ta.channel_id and
+        ta.del_flag=0 and tc.del_flag=0
+        <if test="name!=null">
+            and ta.name=#{name}
+        </if>
+        <if test="channelId!=null">
+            and tc.channel_id=#{channelId}
+        </if>
+        <if test="status!=null">
+            and ta.status=#{status}
+        </if>
+        <if test="type!=null">
+            and ta.type=#{type}
+        </if>
+    </select>
+</mapper>

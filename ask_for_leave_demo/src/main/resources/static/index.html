@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工请假</title>
+    <script src="vue.global.js"></script>
+    <script src="element-plus.js"></script>
+    <link rel="stylesheet" href="element.css">
+
+    <script src="axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <div>
+        <h1>提交请假申请</h1>
+        <table>
+            <tr>
+                <td>请输入请假天数：</td>
+                <td>
+                    <el-input v-model="afl.days" placeholder="请假天数"/>
+                </td>
+            </tr>
+            <tr>
+                <td>请输入请假原因：</td>
+                <td>
+                    <el-input v-model="afl.reason" placeholder="请假原因"/>
+                </td>
+            </tr>
+            <tr>
+                <td>请输入请假开始时间：</td>
+                <td>
+                    <el-date-picker
+                            v-model="afl.startTime"
+                            type="datetime"
+                            format="YYYY-MM-DD HH:mm"
+                            value-format="YYYY-MM-DD HH:mm"
+                            placeholder="开始时间"
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>请输入请假结束时间：</td>
+                <td>
+                    <el-date-picker
+                            v-model="afl.endTime"
+                            type="datetime"
+                            format="YYYY-MM-DD HH:mm"
+                            value-format="YYYY-MM-DD HH:mm"
+                            placeholder="开始时间"
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>请选择审批人：</td>
+                <td>
+                    <el-select v-model="afl.approveUser" class="m-2" placeholder="选择审批人">
+                        <el-option
+                                v-for="item in users"
+                                :key="item.id"
+                                :label="item.username"
+                                :value="item.username"
+                        />
+                    </el-select>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <el-button type="primary" @click="submit">提交请假申请</el-button>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div>
+        <div>
+            <el-tag type="danger">需要审批的请假</el-tag>
+            <el-table :data="tasks" stripe border style="width: 100%">
+                <el-table-column prop="applicant" label="申请人"></el-table-column>
+                <el-table-column prop="days" label="请假天数"></el-table-column>
+                <el-table-column prop="reason" label="请假理由"></el-table-column>
+                <el-table-column prop="startTime" label="起始时间"></el-table-column>
+                <el-table-column prop="endTime" label="结束时间"></el-table-column>
+                <el-table-column label="操作">
+                    <template #default="scope">
+                        <el-button type="primary" @click="handleApprove(scope.row,true)">同意</el-button>
+                        <el-button type="danger" @click="handleApprove(scope.row,false)">拒绝</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <div style="margin-top: 20px">
+            <el-tag>我的请假申请</el-tag>
+            <el-table :data="unapproveProcess" stripe border style="width: 100%">
+                <el-table-column prop="days" label="请假天数"></el-table-column>
+                <el-table-column prop="reason" label="请假理由"></el-table-column>
+                <el-table-column prop="startTime" label="起始时间"></el-table-column>
+                <el-table-column prop="endTime" label="结束时间"></el-table-column>
+                <el-table-column prop="approveUser" label="审批人"></el-table-column>
+                <el-table-column label="操作">
+                    <template #default="scope">
+                        <el-button type="primary" text @click="showProcessImage(scope.row)">查看</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <div style="margin-top: 20px">
+            <el-tag type="info">历史请假申请</el-tag>
+            <el-table :data="histories" stripe border style="width: 100%">
+                <el-table-column prop="days" label="请假天数"></el-table-column>
+                <el-table-column prop="reason" label="请假理由"></el-table-column>
+                <el-table-column prop="startTime" label="起始时间"></el-table-column>
+                <el-table-column prop="endTime" label="结束时间"></el-table-column>
+                <el-table-column prop="approveUser" label="审批人"></el-table-column>
+                <el-table-column label="审批结果">
+                    <template #default="scope">
+                        <el-tag v-if="scope.row.approval" type="success">审批通过</el-tag>
+                        <el-tag v-if="!scope.row.approval" type="danger">审批拒绝</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作">
+                    <template #default="scope">
+                        <el-button type="primary" text @click="showProcessImage(scope.row)">查看</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+    </div>
+    <el-dialog
+            v-model="dialogVisible"
+            title="审批进度"
+            width="700"
+    >
+        <img :src="processImageUrl" style="width: 450px" alt="">
+        <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">
+          确定
+        </el-button>
+      </span>
+        </template>
+    </el-dialog>
+</div>
+<script>
+    Vue.createApp({
+        data() {
+            return {
+                users: [],
+                tasks: [],
+                histories: [],
+                processImageUrl: undefined,
+                dialogVisible: false,
+                unapproveProcess: [],
+                afl: {
+                    days: 0,
+                    reason: null,
+                    startTime: null,
+                    endTime: null,
+                    approveUser: null
+                }
+            }
+        },
+        mounted() {
+            this.initUsers();
+            this.initTasks();
+            this.initHistories();
+            this.loadUnapproveProcess();
+        },
+        methods: {
+            handleApprove(data, approval) {
+                data.approval = approval;
+                let that = this;
+                axios.post('/approve', data)
+                    .then(function (response) {
+                        if (response.data.status == 200) {
+                            that.$message.success(response.data.message);
+                            //刷新自己需要审批的任务列表
+                            that.initTasks();
+                        } else {
+                            that.$message.error(response.data.message);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            initTasks() {
+                let that = this;
+                axios.get('/tasks')
+                    .then(response => {
+                        that.tasks = response.data;
+                    })
+                    .catch(function (error) {
+                        // handle error
+                        console.log(error);
+                    })
+                    .finally(function () {
+                        // always executed
+                    });
+            },
+            initHistories() {
+                let that = this;
+                axios.get('/history')
+                    .then(response => {
+                        that.histories = response.data;
+                    })
+                    .catch(function (error) {
+                        // handle error
+                        console.log(error);
+                    })
+                    .finally(function () {
+                        // always executed
+                    });
+            },
+            showProcessImage(data) {
+                this.processImageUrl = '/image/' + data.processId;
+                this.dialogVisible = true;
+            },
+            loadUnapproveProcess() {
+                let that = this;
+                axios.get('/unapprove')
+                    .then(response => {
+                        that.unapproveProcess = response.data;
+                    })
+                    .catch(function (error) {
+                        // handle error
+                        console.log(error);
+                    })
+                    .finally(function () {
+                        // always executed
+                    });
+            },
+            submit() {
+                let that = this;
+                axios.post('/ask_for_leave', this.afl)
+                    .then(function (response) {
+                        if (response.data.status == 200) {
+                            that.$message.success(response.data.message);
+                            //清空输入框的数据
+                            that.afl = {
+                                days: 0,
+                                reason: null,
+                                startTime: null,
+                                endTime: null,
+                                approveUser: null
+                            };
+                            //刷新表格
+                            that.loadUnapproveProcess();
+                        } else {
+                            that.$message.error(response.data.message);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            initUsers() {
+                let that = this;
+                axios.get('/users')
+                    .then(response => {
+                        that.users = response.data;
+                    })
+                    .catch(function (error) {
+                        // handle error
+                        console.log(error);
+                    })
+                    .finally(function () {
+                        // always executed
+                    });
+            }
+        }
+    }).use(ElementPlus).mount("#app");
+</script>
+</body>
+</html>

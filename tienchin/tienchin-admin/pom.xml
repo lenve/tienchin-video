@@ -37,7 +37,7 @@
             <version>1.6.2</version>
         </dependency>
 
-         <!-- Mysql驱动包 -->
+        <!-- Mysql驱动包 -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -61,6 +61,48 @@
             <artifactId>tienchin-generator</artifactId>
         </dependency>
 
+        <!-- 渠道管理-->
+        <dependency>
+            <groupId>org.javaboy</groupId>
+            <artifactId>tienchin-channel</artifactId>
+        </dependency>
+
+        <!-- 活动管理-->
+        <dependency>
+            <groupId>org.javaboy</groupId>
+            <artifactId>tienchin-activity</artifactId>
+        </dependency>
+
+
+        <!-- 课程管理-->
+        <dependency>
+            <groupId>org.javaboy</groupId>
+            <artifactId>tienchin-course</artifactId>
+        </dependency>
+
+
+        <!-- 线索管理-->
+        <dependency>
+            <groupId>org.javaboy</groupId>
+            <artifactId>tienchin-clue</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -80,15 +122,15 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>   
-                <groupId>org.apache.maven.plugins</groupId>   
-                <artifactId>maven-war-plugin</artifactId>   
-                <version>3.1.0</version>   
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.1.0</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <warName>${project.artifactId}</warName>
-                </configuration>   
-           </plugin>   
+                </configuration>
+            </plugin>
         </plugins>
         <finalName>${project.artifactId}</finalName>
     </build>

@@ -20,4 +20,6 @@ public interface UserMapper {
     User loadUserByUsername(String username);
 
     List<Role> getUserRolesByUserId(Integer id);
+
+    List<User> getAllUsersExcludeCurrent(String name);
 }

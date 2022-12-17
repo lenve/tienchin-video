@@ -10,4 +10,7 @@
     <select id="getUserRolesByUserId" resultType="org.javaboy.ask_for_leave_demo.model.Role">
         select * from role r,user_role ur where r.`id`=ur.rid and ur.uid=#{id}
     </select>
+    <select id="getAllUsersExcludeCurrent" resultType="org.javaboy.ask_for_leave_demo.model.User">
+        select * from user where username!=#{name};
+    </select>
 </mapper>
