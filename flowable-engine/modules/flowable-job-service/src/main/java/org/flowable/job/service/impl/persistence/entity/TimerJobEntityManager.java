@@ -1,0 +1,83 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.flowable.job.service.impl.persistence.entity;
+
+import java.util.List;
+
+import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.JobQueryImpl;
+import org.flowable.job.service.impl.TimerJobQueryImpl;
+import org.flowable.variable.api.delegate.VariableScope;
+
+/**
+ * {@link EntityManager} responsible for {@link TimerJobEntity} instances.
+ *
+ * @author Tijs Rademakers
+ * @author Vasile Dirla
+ */
+public interface TimerJobEntityManager extends JobInfoEntityManager<TimerJobEntity> {
+
+    /**
+     * Insert the {@link TimerJobEntity}, similar to insert(TimerJobEntity), but returns a boolean in case the insert did not go through. This could happen if the execution related to the
+     * {@link TimerJobEntity} has been removed (for example due to a task complete for a timer boundary on that task).
+     */
+    boolean insertTimerJobEntity(TimerJobEntity timerJobEntity);
+
+    /**
+     * Find the timer job with the given correlation id.
+     */
+    TimerJobEntity findJobByCorrelationId(String correlationId);
+
+    /**
+     * Returns the {@link TimerJobEntity} for a given process definition.
+     * <p>
+     * This is for example used when deleting a process definition: it finds the {@link TimerJobEntity} representing the timer start events.
+     */
+    List<TimerJobEntity> findJobsByTypeAndProcessDefinitionId(String type, String processDefinitionId);
+
+    /**
+     * The same as {@link #findJobsByTypeAndProcessDefinitionId(String, String)}, but by key and for a specific tenantId.
+     */
+    List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyAndTenantId(String type, String processDefinitionKey, String tenantId);
+
+    /**
+     * The same as {@link #findJobsByTypeAndProcessDefinitionId(String, String)}, but by key and specifically for the 'no tenant' mode.
+     */
+    List<TimerJobEntity> findJobsByTypeAndProcessDefinitionKeyNoTenantId(String type, String processDefinitionKey);
+
+    /**
+     * Returns all {@link TimerJobEntity} for the given scope and subscope.
+     */
+    List<TimerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId);
+
+    /**
+     * Executes a {@link JobQueryImpl} and returns the matching {@link TimerJobEntity} instances.
+     */
+    List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery);
+
+    /**
+     * Same as {@link #findJobsByQueryCriteria(TimerJobQueryImpl)}, but only returns a count and not the instances itself.
+     */
+    long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery);
+
+    /**
+     * Creates a new {@link TimerJobEntity}, typically when a timer is used in a repeating way. The returns {@link TimerJobEntity} is not yet inserted.
+     * <p>
+     * Returns null if the timer has finished its repetitions.
+     */
+    TimerJobEntity createAndCalculateNextTimer(JobEntity timerEntity, VariableScope variableScope);
+
+    void bulkDeleteTimerJobsWithoutRevisionCheck(List<TimerJobEntity> timerJobEntities);
+
+}

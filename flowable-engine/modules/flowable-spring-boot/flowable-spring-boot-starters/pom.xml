@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <parent>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-spring-boot</artifactId>
+        <relativePath>../</relativePath>
+        <version>6.7.2.30</version>
+    </parent>
+
+    <artifactId>flowable-spring-boot-starters</artifactId>
+
+    <packaging>pom</packaging>
+    <modules>
+        <module>flowable-spring-boot-autoconfigure</module>
+        <module>flowable-spring-boot-starter-basic</module>
+        <module>flowable-spring-boot-starter-integration</module>
+        <module>flowable-spring-boot-starter-actuator</module>
+        <module>flowable-spring-boot-starter</module>
+        <module>flowable-spring-boot-starter-cmmn</module>
+        <module>flowable-spring-boot-starter-cmmn-rest</module>
+        <module>flowable-spring-boot-starter-dmn</module>
+        <module>flowable-spring-boot-starter-dmn-rest</module>
+        <module>flowable-spring-boot-starter-process</module>
+        <module>flowable-spring-boot-starter-process-rest</module>
+        <module>flowable-spring-boot-starter-app</module>
+        <module>flowable-spring-boot-starter-app-rest</module>
+        <module>flowable-spring-boot-starter-rest-api</module>
+        <module>flowable-spring-boot-starter-rest</module>
+    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,533 @@
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns="http://maven.apache.org/POM/4.0.0"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+	<name>Flowable - IDM Engine</name>
+	<artifactId>flowable-idm-engine</artifactId>
+
+	<parent>
+		<groupId>org.flowable</groupId>
+		<artifactId>flowable-root</artifactId>
+		<relativePath>../..</relativePath>
+		<version>6.7.2.30</version>
+	</parent>
+
+	<properties>
+		<flowable.artifact>
+			org.flowable.idm.engine
+		</flowable.artifact>
+        <flowable.osgi.export.additional>
+            org.flowable.idm.db.create,
+            org.flowable.idm.db.update,
+            org.flowable.idm.db.mapping,
+            org.flowable.idm.db.mapping.entity,
+        </flowable.osgi.export.additional>
+        <flowable.osgi.import.additional>
+            junit*;resolution:=optional,
+            org.junit*;resolution:=optional,
+			org.springframework*;resolution:=optional,
+            org.apache.commons.codec*;resolution:=optional,
+		</flowable.osgi.import.additional>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-engine-common-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-engine-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-idm-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-logging</groupId>
+			<artifactId>commons-logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.uuid</groupId>
+			<artifactId>java-uuid-generator</artifactId>
+		</dependency>
+
+		<!-- For testing -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.jasypt/jasypt -->
+		<dependency>
+			<groupId>org.jasypt</groupId>
+			<artifactId>jasypt</artifactId>
+			<version>1.9.2</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/de.svenkubiak/jBCrypt -->
+		<dependency>
+			<groupId>de.svenkubiak</groupId>
+			<artifactId>jBCrypt</artifactId>
+			<version>0.4.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>cleanVersions</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.felix</groupId>
+										<artifactId>
+											maven-bundle-plugin
+										</artifactId>
+										<versionRange>
+											[2.1.0,)
+										</versionRange>
+										<goals>
+											<goal>cleanVersions</goal>
+											<goal>manifest</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>cleanDb</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>drop-idm-schema</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>java</goal>
+								</goals>
+								<configuration>
+									<mainClass>org.flowable.idm.engine.impl.db.DbSchemaDrop</mainClass>
+									<classpathScope>test</classpathScope>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+        <!-- database qa profile -->
+		<profile>
+			<id>databaseidm</id>
+			<activation>
+				<property>
+					<name>databaseidm</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<!-- only worked with this version, there might be a bug with antrun 
+							see http://jira.codehaus.org/browse/MANTRUN-109 -->
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>database-test-create-schema</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<echo message="updating flowable idm configuration to db ${databaseidm}" />
+										<copy file="${basedir}/../../qa/db/flowable.idm.cfg.xml"
+											todir="target/test-classes" overwrite="true">
+											<filterset
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databaseidm}.properties" />
+										</copy>
+									</tasks>
+								</configuration>
+							</execution>
+							<execution>
+								<id>database-test-drop-schema</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<echo message="dropping schema in ${databaseidm}" />
+										<java classname="org.flowable.idm.engine.impl.db.DbSchemaDrop"
+											classpathref="maven.test.classpath" />
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+        
+        <profile>
+            <id>databasemssqlidm</id>
+            <activation>
+                <property>
+                    <name>databasemssqlidm</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be a bug with antrun 
+                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-test-create-schema</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="updating flowable idm configuration to db ${databaseidm}" />
+                                        <copy file="${basedir}/../../qa/db/flowable.mssql.idm.cfg.xml"
+                                            tofile="target/test-classes/flowable.idm.cfg.xml" overwrite="true">
+                                            <filterset
+                                                filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasemssqlidm}.properties" />
+                                        </copy>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>database-test-drop-schema</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="dropping schema in ${databasemssqlidm}" />
+                                        <java classname="org.flowable.idm.engine.impl.db.DbSchemaDrop"
+                                            classpathref="maven.test.classpath" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+		<profile>
+			<id>databasewithschemaidm</id>
+			<activation>
+				<property>
+					<name>databasewithschemaidm</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<!-- only worked with this version, there might be a bug with antrun 
+							see http://jira.codehaus.org/browse/MANTRUN-109 -->
+						<version>1.4</version>
+						<executions>
+							<execution>
+								<id>database-test-create-schema</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<echo message="updating flowable idm configuration to db ${databasewithschemaidm}" />
+										<copy file="${basedir}/../../qa/db/schema/flowable.idm.cfg.xml"
+											todir="target/test-classes" overwrite="true">
+											<filterset
+												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemaidm}.properties" />
+										</copy>
+									</tasks>
+								</configuration>
+							</execution>
+							<execution>
+								<id>database-test-drop-schema</id>
+								<phase>prepare-package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<echo message="dropping schema in ${databasewithschemaidm}" />
+										<java classname="org.flowable.idm.engine.impl.db.DbSchemaDrop"
+											classpathref="maven.test.classpath" />
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<profile>
+			<id>oracle</id>
+			<activation>
+				<property>
+					<name>databaseidm</name>
+					<value>oracle</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle.database.jdbc</groupId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<profile>
+			<id>oraclewithschemaidm</id>
+			<activation>
+				<property>
+					<name>databasewithschemaidm</name>
+					<value>oracle</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.oracle.database.jdbc</groupId>
+					<artifactId>${oracle.jdbc.artifact}</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<profile>
+			<id>db2</id>
+			<activation>
+				<property>
+					<name>databaseidm</name>
+					<value>db2</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+                    <groupId>com.ibm.db2</groupId>
+                    <artifactId>jcc</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<profile>
+			<id>mssql</id>
+			<activation>
+				<property>
+					<name>databasemssqlidm</name>
+					<value>mssql</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>net.sourceforge.jtds</groupId>
+					<artifactId>jtds</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<profile>
+			<id>mysql</id>
+			<activation>
+				<property>
+					<name>databaseidm</name>
+					<value>mysql</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>mysql</groupId>
+					<artifactId>mysql-connector-java</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+
+		<profile>
+			<id>hsql</id>
+			<activation>
+				<property>
+					<name>databaseidm</name>
+					<value>hsql</value>
+				</property>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.hsqldb</groupId>
+					<artifactId>hsqldb</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+        
+        <profile>
+            <id>errorLogging</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <!-- only worked with this version, there might be a bug with antrun 
+                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>database-copy-logging</id>
+                                <phase>process-test-classes</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <echo message="updating log4j configuration to error logging" />
+                                        <copy file="${basedir}/../../qa/logging/log4j.properties" todir="target/test-classes" overwrite="true" />
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+	</profiles>
+
+</project>

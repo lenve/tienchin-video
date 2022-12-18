@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  <settings>
+    <setting name="lazyLoadingEnabled" value="false" />
+  </settings>
+  <mappers>
+    <!-- Common mappers -->
+    <mapper resource="org/flowable/common/db/mapping/entity/Property.xml" />
+    <mapper resource="org/flowable/common/db/mapping/common.xml" />
+
+    <mapper resource="org/flowable/dmn/db/mapping/ChangeTenantDmn.xml" />
+
+    <!-- Engine mappers -->
+    <mapper resource="org/flowable/dmn/db/mapping/entity/Decision.xml" />
+    <mapper resource="org/flowable/dmn/db/mapping/entity/DmnDeployment.xml" />
+    <mapper resource="org/flowable/dmn/db/mapping/entity/HistoricDecisionExecution.xml" />
+    <mapper resource="org/flowable/dmn/db/mapping/entity/DmnResource.xml" />
+    <mapper resource="org/flowable/common/db/mapping/entity/TableData.xml" />
+  </mappers>
+</configuration>

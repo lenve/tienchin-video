@@ -1,0 +1,5 @@
+flowable:
+  customMybatisXMLMappers:
+    - mappers/CustomMybatisXmlMapper.xml
+  customMybatisMappers:
+    - flowable.mappers.CustomMybatisMapper
