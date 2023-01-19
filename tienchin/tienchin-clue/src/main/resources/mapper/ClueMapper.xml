@@ -2,4 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.javaboy.tienchin.clue.mapper.ClueMapper">
 
+    <select id="selectClueList" resultType="org.javaboy.tienchin.clue.domain.vo.ClueSummary">
+        select tc.clue_id,tc.name,tch.channel_name,tc.phone,tc.status,tc.create_time,tc.create_by,ta.user_name as owner,tc.next_time from tienchin_clue tc left join tienchin_channel tch on tc.channel_id=tch.channel_id left join tienchin_assignment ta on tc.clue_id=ta.assign_id and ta.latest=true
+    </select>
+    <select id="getClueDetailsByClueId" resultType="org.javaboy.tienchin.clue.domain.vo.ClueDetails">
+        select tc.clue_id,tc.name,tc.gender,tc.age,tc.weixin,tc.qq,tc.phone,tc.level,tc.subject,tc.status,tc.fail_count,tc.next_time,tch.channel_name,tas.create_by as allocator,ta.name as activity_name,ta.info as activity_info,tas.user_name as owner,tas.create_time as belongTime,tc.create_time from tienchin_clue tc left join tienchin_activity ta on tc.activity_id=ta.activity_id left join tienchin_channel tch on tc.channel_id=tch.channel_id left join tienchin_assignment tas on tc.clue_id=tas.assign_id and tas.latest=true where tc.clue_id=#{cludId}
+    </select>
 </mapper>

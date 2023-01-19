@@ -141,8 +141,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="checkEmailUnique" parameterType="String" resultMap="SysUserResult">
 		select user_id, email from sys_user where email = #{email} limit 1
 	</select>
-	
-	<insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+    <select id="getUsersByDeptId" resultMap="SysUserResult">
+		select su.user_id,su.nick_name,su.user_name,su.dept_id from sys_user su,sys_dept sd where su.dept_id=sd.dept_id and (find_in_set(#{deptId},ancestors) or su.dept_id=#{deptId});
+	</select>
+
+    <insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
  		insert into sys_user(
  			<if test="userId != null and userId != 0">user_id,</if>
  			<if test="deptId != null and deptId != 0">dept_id,</if>
