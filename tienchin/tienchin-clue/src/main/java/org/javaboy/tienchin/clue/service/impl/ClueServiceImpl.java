@@ -1,23 +1,28 @@
 package org.javaboy.tienchin.clue.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.javaboy.tienchin.clue.domain.Assignment;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.javaboy.tienchin.assignment.service.IAssignmentService;
+import org.javaboy.tienchin.business.domain.Business;
+import org.javaboy.tienchin.business.service.IBusinessService;
+import org.javaboy.tienchin.assignment.domain.Assignment;
 import org.javaboy.tienchin.clue.domain.Clue;
+import org.javaboy.tienchin.clue.domain.FollowRecord;
 import org.javaboy.tienchin.clue.domain.vo.ClueDetails;
 import org.javaboy.tienchin.clue.domain.vo.ClueSummary;
+import org.javaboy.tienchin.clue.domain.vo.ClueVO;
 import org.javaboy.tienchin.clue.mapper.ClueMapper;
-import org.javaboy.tienchin.clue.service.IAssignmentService;
 import org.javaboy.tienchin.clue.service.IClueService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.javaboy.tienchin.clue.service.IFollowRecordService;
 import org.javaboy.tienchin.common.constant.TienChinConstants;
 import org.javaboy.tienchin.common.core.domain.AjaxResult;
-import org.javaboy.tienchin.common.utils.DateUtils;
 import org.javaboy.tienchin.common.utils.SecurityUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,7 +42,13 @@ public class ClueServiceImpl extends ServiceImpl<ClueMapper, Clue> implements IC
     IAssignmentService assignmentService;
 
     @Autowired
+    IFollowRecordService followRecordService;
+
+    @Autowired
     ClueMapper clueMapper;
+
+    @Autowired
+    IBusinessService businessService;
 
     @Override
     @Transactional
@@ -72,8 +83,8 @@ public class ClueServiceImpl extends ServiceImpl<ClueMapper, Clue> implements IC
     }
 
     @Override
-    public List<ClueSummary> selectClueList() {
-        return clueMapper.selectClueList();
+    public List<ClueSummary> selectClueList(ClueVO clueVO) {
+        return clueMapper.selectClueList(clueVO);
     }
 
     @Override
@@ -82,4 +93,117 @@ public class ClueServiceImpl extends ServiceImpl<ClueMapper, Clue> implements IC
         return AjaxResult.success(cd);
     }
 
+    @Override
+    @Transactional
+    public AjaxResult clueFollow(ClueDetails clueDetails) {
+        try {
+            //1. 更新 tienchin_clue 表
+            Clue clue = new Clue();
+            //先将 clueDetails 中的属性拷贝到 clue 中
+            BeanUtils.copyProperties(clueDetails, clue);
+            clue.setStatus(TienChinConstants.CLUE_FOLLOWING);
+            updateById(clue);
+            //2。 更新 tienchin_clue_follow 表
+            FollowRecord record = new FollowRecord();
+            record.setAssignId(clueDetails.getClueId());
+            record.setCreateBy(SecurityUtils.getUsername());
+            record.setCreateTime(LocalDateTime.now());
+            record.setType(TienChinConstants.CLUE_TYPE);
+            record.setInfo(clueDetails.getRecord());
+            followRecordService.save(record);
+            return AjaxResult.success("线索跟进成功");
+        } catch (BeansException e) {
+            return AjaxResult.error("跟进失败：" + e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
+    public AjaxResult invalidClueFollow(ClueDetails clueDetails) {
+        try {
+            //如果已经失败了三次了，则这条线索直接变为伪线索
+            Clue c = getById(clueDetails.getClueId());
+            if (c.getFailCount() == 3) {
+                //无效线索次数已达极限
+                UpdateWrapper<Clue> updateWrapper = new UpdateWrapper<>();
+                updateWrapper.lambda().set(Clue::getStatus, TienChinConstants.CLUE_INVALIDATE).eq(Clue::getClueId, clueDetails.getClueId());
+                update(updateWrapper);
+                return AjaxResult.success("无效线索设置成功");
+            }
+            //1. 首先需要设置线索表中的 fail_count 字段+1
+            UpdateWrapper<Clue> uw = new UpdateWrapper<>();
+            uw.lambda().setSql("fail_count=fail_count+1").eq(Clue::getClueId, clueDetails.getClueId());
+            update(uw);
+            //2。需要往线索记录表中添加一条记录
+            FollowRecord record = new FollowRecord();
+            record.setInfo(clueDetails.getRecord());
+            record.setType(TienChinConstants.CLUE_TYPE);
+            record.setCreateTime(LocalDateTime.now());
+            record.setCreateBy(SecurityUtils.getUsername());
+            record.setAssignId(clueDetails.getClueId());
+            followRecordService.save(record);
+            return AjaxResult.success("无效线索设置成功");
+        } catch (Exception e) {
+            return AjaxResult.error("设置失败：" + e.getMessage());
+        }
+    }
+
+    @Override
+    public AjaxResult getClueSummaryByClueId(Integer clueId) {
+        Clue c = getById(clueId);
+        return AjaxResult.success(c);
+    }
+
+    @Override
+    public AjaxResult updateClue(Clue clue) {
+        return updateById(clue) ? AjaxResult.success("更新成功") : AjaxResult.error("更新失败");
+    }
+
+    @Override
+    public AjaxResult deleteClueById(Integer[] clueIds) {
+        UpdateWrapper<Clue> uw = new UpdateWrapper<>();
+        uw.lambda().set(Clue::getDelFlag, 1).in(Clue::getClueId, clueIds);
+        return update(uw) ? AjaxResult.success("更新成功") : AjaxResult.error("更新失败");
+    }
+
+    @Override
+    @Transactional
+    public AjaxResult clue2Business(Integer clueId) {
+        try {
+            Clue clue = getById(clueId);
+            Business business = new Business();
+            BeanUtils.copyProperties(clue, business);
+            business.setCreateBy(SecurityUtils.getUsername());
+            business.setCreateTime(LocalDateTime.now());
+            business.setEndTime(null);
+            business.setFailCount(0);
+            business.setNextTime(null);
+            business.setRemark(null);
+            business.setUpdateBy(null);
+            business.setUpdateTime(null);
+            business.setNextTime(LocalDateTime.now().plusHours(TienChinConstants.NEXT_FOLLOW_TIME));
+            business.setStatus(TienChinConstants.BUSINESS_ALLOCATED);
+            //1. 删除线索
+            UpdateWrapper<Clue> uw = new UpdateWrapper<>();
+            uw.lambda().set(Clue::getDelFlag, 1).eq(Clue::getClueId, clueId);
+            update(uw);
+            //2。添加商机
+            businessService.save(business);
+            //3. 默认情况下，将商机分配给 admin，将来由 admin再将商机分配给不同的客户专员
+            Assignment assignment = new Assignment();
+            assignment.setUserName(TienChinConstants.AMDIN_USERNAME);
+            assignment.setType(TienChinConstants.BUSINESS_TYPE);
+            assignment.setCreateBy(SecurityUtils.getUsername());
+            assignment.setCreateTime(LocalDateTime.now());
+            assignment.setAssignId(business.getBusinessId());
+            assignment.setDeptId(TienChinConstants.ADMIN_DEPT_ID);
+            assignment.setUserId(TienChinConstants.ADMIN_ID);
+            assignment.setLatest(true);
+            assignmentService.save(assignment);
+            return AjaxResult.success("线索成功转为商机");
+        } catch (BeansException e) {
+//            throw new RuntimeException(e);
+        }
+        return AjaxResult.error("转换失败");
+    }
 }

@@ -245,6 +245,21 @@
                 <version>${tienchin.version}</version>
             </dependency>
 
+            <!-- 商机管理-->
+            <dependency>
+                <groupId>org.javaboy</groupId>
+                <artifactId>tienchin-business</artifactId>
+                <version>${tienchin.version}</version>
+            </dependency>
+
+
+            <!-- 商机/线索分配管理-->
+            <dependency>
+                <groupId>org.javaboy</groupId>
+                <artifactId>tienchin-assignment</artifactId>
+                <version>${tienchin.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -259,6 +274,8 @@
         <module>tienchin-activity</module>
         <module>tienchin-course</module>
         <module>tienchin-clue</module>
+        <module>tienchin-business</module>
+        <module>tienchin-assignment</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -1,7 +1,8 @@
-package org.javaboy.tienchin.clue.mapper;
+package org.javaboy.tienchin.assignment.mapper;
 
-import org.javaboy.tienchin.clue.domain.Assignment;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.javaboy.tienchin.assignment.domain.Assignment;
 
 /**
  * <p>

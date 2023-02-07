@@ -1,4 +1,4 @@
-package org.javaboy.tienchin.clue.domain;
+package org.javaboy.tienchin.assignment.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

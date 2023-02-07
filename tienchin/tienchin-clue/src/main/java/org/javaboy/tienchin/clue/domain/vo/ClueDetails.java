@@ -2,6 +2,7 @@ package org.javaboy.tienchin.clue.domain.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -65,6 +66,7 @@ public class ClueDetails {
     /**
      * 下次跟进时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "Asia/Shanghai")
     private LocalDateTime nextTime;
 
 
@@ -78,10 +80,19 @@ public class ClueDetails {
     private String activityInfo;
 
     private String owner;
+    private String record;
 
     private LocalDateTime belongTime;
 
     private LocalDateTime createTime;
+
+    public String getRecord() {
+        return record;
+    }
+
+    public void setRecord(String record) {
+        this.record = record;
+    }
 
     public LocalDateTime getCreateTime() {
         return createTime;

@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 查询渠道列表
 export function listChannels(query) {
     return request({
-        url: '/tienchin/clue/channels',
+        url: '/tienchin/business/channels',
         method: 'get',
         params: query
     })
@@ -25,15 +25,15 @@ export function getClueById(clueId) {
 // 查询活动列表
 export function listActivity(channelId) {
     return request({
-        url: '/tienchin/clue/activity/'+channelId,
+        url: '/tienchin/business/activity/'+channelId,
         method: 'get'
     })
 }
 
 // 查询线索列表
-export function listClue(query) {
+export function listBusiness(query) {
     return request({
-        url: '/tienchin/clue/list',
+        url: '/tienchin/business/list',
         method: 'get',
         params: query
     })
@@ -63,9 +63,9 @@ export function getClueRecordByClueId(clueId) {
 }
 
 // 新增线索
-export function addClue(data) {
+export function addBusiness(data) {
     return request({
-        url: '/tienchin/clue',
+        url: '/tienchin/business',
         method: 'post',
         data: data
     })
@@ -95,7 +95,7 @@ export function clueFollow(data) {
     })
 }
 // 线索分配
-export function assignClue(data) {
+export function assignBusiness(data) {
     return request({
         url: '/tienchin/assignment',
         method: 'post',

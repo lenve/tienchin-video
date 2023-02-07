@@ -1,45 +1,68 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="线索名称" prop="name">
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="80px">
+      <el-form-item label="客户姓名" prop="name">
         <el-input
             v-model="queryParams.name"
-            placeholder="请输入线索名称"
+            placeholder="请输入客户姓名"
             clearable
             @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="线索类型" prop="type">
+      <el-form-item label="客户手机" prop="phone">
+        <el-input
+            v-model="queryParams.phone"
+            placeholder="请输入客户手机号码"
+            clearable
+            @keyup.enter="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="归属人" prop="owner">
+        <el-input
+            v-model="queryParams.owner"
+            placeholder="请输入线索归属人"
+            clearable
+            @keyup.enter="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="渠道来源" prop="channelId">
         <el-select
-            v-model="queryParams.type"
-            placeholder="线索类型"
+            v-model="queryParams.channelId"
+            placeholder="渠道来源"
             clearable
         >
           <el-option
-              v-for="ct in course_type"
-              :key="ct.value"
-              :label="ct.label"
-              :value="ct.value"
+              v-for="cl in channelList"
+              :key="cl.channelId"
+              :label="cl.channelName"
+              :value="cl.channelId"
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="适用人群" prop="applyTo">
-        <el-select v-model="queryParams.applyTo" placeholder="适用人群" clearable>
+      <el-form-item label="线索状态" prop="status">
+        <el-select
+            v-model="queryParams.status"
+            placeholder="线索状态"
+            clearable
+        >
           <el-option
-              v-for="cat in course_apply_to"
-              :key="cat.value"
-              :label="cat.label"
-              :value="cat.value"
+              v-for="cs in clue_status"
+              :key="cs.value"
+              :label="cs.label"
+              :value="cs.value"
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="最低价格" prop="minPrice">
-        <el-input-number placeholder="最低价格" @keyup.enter="handleQuery" clearable v-model="queryParams.minPrice"
-                         :precision="2" :step="100" :min="0"/>
-      </el-form-item>
-      <el-form-item label="最高价格" prop="maxPrice">
-        <el-input-number placeholder="最高价格" @keyup.enter="handleQuery" clearable v-model="queryParams.maxPrice"
-                         :precision="2" :step="100" :min="0"/>
+      <el-form-item label="跟进时间">
+        <el-date-picker
+            v-model="queryParams.dateRange"
+            value-format="YYYY-MM-DD hh:mm:ss"
+            format="YYYY-MM-DD hh:mm:ss"
+            type="datetimerange"
+            range-separator="-"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+        ></el-date-picker>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -126,6 +149,7 @@
           >查看
           </el-button>
           <el-button
+              v-if="scope.row.status==1"
               type="text"
               icon="Pointer"
               @click="handleAssign(scope.row)"
@@ -133,6 +157,7 @@
           >分配
           </el-button>
           <el-button
+              v-if="scope.row.owner==userStore.name &&(scope.row.status==1||scope.row.status==2)"
               type="text"
               icon="TopRight"
               @click="handleClueFollow(scope.row)"
@@ -290,10 +315,21 @@
 </template>
 
 <script setup name="Post">
-import {listCourse, addCourse, getCourse, updateCourse, delCourse} from "../../../api/tienchin/course";
+import useUserStore from '@/store/modules/user'
 import {treeselect} from "@/api/system/dept";
-import {listChannels, listActivity, addClue, listClue, listUsers, assignClue} from "../../../api/tienchin/clue";
+import {
+  listChannels,
+  listActivity,
+  addClue,
+  listClue,
+  listUsers,
+  assignClue,
+  getClueSummaryById,
+  updateClue,
+  delClue
+} from "../../../api/tienchin/clue";
 
+const userStore = useUserStore();
 const router = useRouter();
 const {proxy} = getCurrentInstance();
 const {clue_status, course_apply_to, sys_user_sex} = proxy.useDict("clue_status", "course_apply_to", "sys_user_sex");
@@ -322,8 +358,10 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     name: undefined,
+    phone: undefined,
+    owner: undefined,
     channelId: undefined,
-    type: undefined,
+    dateRange: undefined,
     status: undefined
   },
   rules: {
@@ -394,6 +432,7 @@ function initUsers() {
 
 function handleAssign(data) {
   assignForm.value.assignId = data.clueId;
+  assignForm.value.type = 0;
   initDeptOptions();
   assignClueDialog.value = true;
 }
@@ -422,7 +461,7 @@ function getAllChannels() {
 /** 查询线索列表 */
 function getList() {
   loading.value = true;
-  listClue(queryParams.value).then(response => {
+  listClue(proxy.addDateRange(queryParams.value, queryParams.value.dateRange)).then(response => {
     clueList.value = response.rows;
     total.value = response.total;
     loading.value = false;
@@ -464,7 +503,7 @@ function resetQuery() {
 
 /** 多选框选中数据 */
 function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.courseId);
+  ids.value = selection.map(item => item.clueId);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }
@@ -472,17 +511,22 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
-  getAllChannels();
   open.value = true;
   title.value = "添加线索";
 }
 
+getAllChannels();
+
 /** 修改按钮操作 */
-function handleUpdate(row) {
+function handleUpdate() {
   reset();
-  const courseId = row.courseId || ids.value;
-  getCourse(courseId).then(response => {
+  getAllChannels();
+  const clueId = ids.value;
+  getClueSummaryById(clueId).then(response => {
     form.value = response.data;
+    listActivity(response.data.channelId).then(response => {
+      activityList.value = response.data;
+    })
     open.value = true;
     title.value = "修改线索";
   });
@@ -492,8 +536,8 @@ function handleUpdate(row) {
 function submitForm() {
   proxy.$refs["clueRef"].validate(valid => {
     if (valid) {
-      if (form.value.courseId != undefined) {
-        updateCourse(form.value).then(response => {
+      if (form.value.clueId != undefined) {
+        updateClue(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
@@ -511,9 +555,9 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const courseIds = row.courseId || ids.value;
-  proxy.$modal.confirm('是否确认删除线索编号为"' + courseIds + '"的数据项？').then(function () {
-    return delCourse(courseIds);
+  const clueIds = ids.value;
+  proxy.$modal.confirm('是否确认删除线索编号为"' + clueIds + '"的数据项？').then(function () {
+    return delClue(clueIds);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");

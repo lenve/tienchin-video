@@ -1,10 +1,10 @@
-package org.javaboy.tienchin.clue.service.impl;
+package org.javaboy.tienchin.assignment.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.javaboy.tienchin.clue.domain.Assignment;
-import org.javaboy.tienchin.clue.mapper.AssignmentMapper;
-import org.javaboy.tienchin.clue.service.IAssignmentService;
+import org.javaboy.tienchin.assignment.domain.Assignment;
+import org.javaboy.tienchin.assignment.mapper.AssignmentMapper;
+import org.javaboy.tienchin.assignment.service.IAssignmentService;
 import org.javaboy.tienchin.common.constant.TienChinConstants;
 import org.javaboy.tienchin.common.core.domain.AjaxResult;
 import org.javaboy.tienchin.common.utils.SecurityUtils;
@@ -33,7 +33,7 @@ public class AssignmentServiceImpl extends ServiceImpl<AssignmentMapper, Assignm
             uw.lambda().set(Assignment::getLatest, false).eq(Assignment::getAssignId, assignment.getAssignId());
             update(uw);
             //2。 分配线索
-            assignment.setType(TienChinConstants.CLUE_TYPE);
+//            assignment.setType(TienChinConstants.CLUE_TYPE);
             assignment.setCreateBy(SecurityUtils.getUsername());
             assignment.setCreateTime(LocalDateTime.now());
             assignment.setLatest(true);

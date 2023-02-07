@@ -1,76 +1,72 @@
-package org.javaboy.tienchin.clue.domain;
+package org.javaboy.tienchin.business.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import org.javaboy.tienchin.common.validator.CreateGroup;
-import org.javaboy.tienchin.common.validator.EditGroup;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * <p>
- * 
+ * 线索
  * </p>
  *
  * @author javaboy
- * @since 2022-12-14
+ * @since 2023-02-04
  */
-@TableName("tienchin_clue")
-public class Clue implements Serializable {
+@TableName("tienchin_business")
+public class Business implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 线索编号
+     * 线索id
      */
-    @TableId(value = "clue_id", type = IdType.AUTO)
-    @NotNull(message = "{clue.clueId.notnull}",groups = EditGroup.class)
-    private Integer clueId;
+    @TableId(value = "business_id", type = IdType.AUTO)
+    private Integer businessId;
 
     /**
      * 客户姓名
      */
-    @NotBlank(message = "{clue.name.notblank}",groups = {EditGroup.class, CreateGroup.class})
+    @NotBlank(message = "{business.name.notblank}")
     private String name;
 
     /**
-     * 渠道ID
+     * 渠道
      */
     private Integer channelId;
 
     /**
-     * 活动ID
+     * 活动
      */
     private Integer activityId;
 
     /**
-     * 0 男 1女
+     * 0 男 1 女
      */
     private Integer gender;
 
     /**
-     * 客户年龄
+     * 年龄
      */
     private Integer age;
 
     /**
-     * 客户微信
+     * 微信
      */
     private String weixin;
 
     /**
-     * 客户QQ
+     * qq
      */
     private String qq;
 
     /**
-     * 客户电话
+     * 手机号
      */
-    @NotBlank(message = "{clue.phone.notblank}",groups = {EditGroup.class, CreateGroup.class})
+    @NotBlank(message = "{business.phone.notblank}")
     private String phone;
 
     /**
@@ -79,17 +75,17 @@ public class Clue implements Serializable {
     private Integer level;
 
     /**
-     * 私教课程
+     * 意向私教课程
      */
     private Integer subject;
 
     /**
-     * 线索状态 1 已分配 2 跟进中 3 回收 4 伪线索
+     * 状态(已分配1  进行中2  回收3)
      */
     private Integer status;
 
     /**
-     * 伪线索失败次数，最大 3 次
+     * 伪线索失败次数(最大数3次)
      */
     private Integer failCount;
 
@@ -99,41 +95,111 @@ public class Clue implements Serializable {
     private LocalDateTime nextTime;
 
     /**
+     * 是否转派
+     */
+    private Boolean transfer;
+
+    /**
      * 线索失效时间
      */
     private LocalDateTime endTime;
 
     /**
-     * 线索是否需要转派
+     * 创建时间
      */
-    private Boolean transfer;
-
-    private Integer remark;
-
     private LocalDateTime createTime;
 
+    /**
+     * 创建人
+     */
     private String createBy;
 
+    /**
+     * 更新时间
+     */
     private LocalDateTime updateTime;
 
+    /**
+     * 更新人
+     */
     private String updateBy;
 
+    /**
+     * 备注信息
+     */
+    private String remark;
+
+    /**
+     * 0 未删除 1 表示删除
+     */
     private Integer delFlag;
 
-    public Integer getDelFlag() {
-        return delFlag;
+    /**
+     * 省
+     */
+    private String province;
+
+    /**
+     * 市
+     */
+    private String city;
+
+    /**
+     * 区
+     */
+    private String area;
+
+    /**
+     * 课程ID
+     */
+    private Integer courseId;
+
+    /**
+     * 职业
+     */
+    private String occupation;
+
+    /**
+     * 学历
+     */
+    private String education;
+
+    /**
+     * 身高
+     */
+    private Object height;
+
+    /**
+     * 体重
+     */
+    private Object weight;
+
+    /**
+     * 锻炼的原因
+     */
+    private String reason;
+
+    /**
+     * 每周可以用于锻炼的时间
+     */
+    private Integer hours;
+
+    /**
+     * 其他意向
+     */
+    private String othenIntention;
+
+    /**
+     * 线索ID
+     */
+    private Integer clueId;
+
+    public Integer getBusinessId() {
+        return businessId;
     }
 
-    public void setDelFlag(Integer delFlag) {
-        this.delFlag = delFlag;
-    }
-
-    public Integer getClueId() {
-        return clueId;
-    }
-
-    public void setClueId(Integer clueId) {
-        this.clueId = clueId;
+    public void setBusinessId(Integer businessId) {
+        this.businessId = businessId;
     }
 
     public String getName() {
@@ -240,14 +306,6 @@ public class Clue implements Serializable {
         this.nextTime = nextTime;
     }
 
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
     public Boolean getTransfer() {
         return transfer;
     }
@@ -256,12 +314,12 @@ public class Clue implements Serializable {
         this.transfer = transfer;
     }
 
-    public Integer getRemark() {
-        return remark;
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
-    public void setRemark(Integer remark) {
-        this.remark = remark;
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 
     public LocalDateTime getCreateTime() {
@@ -296,10 +354,122 @@ public class Clue implements Serializable {
         this.updateBy = updateBy;
     }
 
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public Integer getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Integer courseId) {
+        this.courseId = courseId;
+    }
+
+    public String getOccupation() {
+        return occupation;
+    }
+
+    public void setOccupation(String occupation) {
+        this.occupation = occupation;
+    }
+
+    public String getEducation() {
+        return education;
+    }
+
+    public void setEducation(String education) {
+        this.education = education;
+    }
+
+    public Object getHeight() {
+        return height;
+    }
+
+    public void setHeight(Object height) {
+        this.height = height;
+    }
+
+    public Object getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Object weight) {
+        this.weight = weight;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public Integer getHours() {
+        return hours;
+    }
+
+    public void setHours(Integer hours) {
+        this.hours = hours;
+    }
+
+    public String getOthenIntention() {
+        return othenIntention;
+    }
+
+    public void setOthenIntention(String othenIntention) {
+        this.othenIntention = othenIntention;
+    }
+
+    public Integer getClueId() {
+        return clueId;
+    }
+
+    public void setClueId(Integer clueId) {
+        this.clueId = clueId;
+    }
+
     @Override
     public String toString() {
-        return "Clue{" +
-            "clueId = " + clueId +
+        return "Business{" +
+            "businessId = " + businessId +
             ", name = " + name +
             ", channelId = " + channelId +
             ", activityId = " + activityId +
@@ -313,13 +483,26 @@ public class Clue implements Serializable {
             ", status = " + status +
             ", failCount = " + failCount +
             ", nextTime = " + nextTime +
-            ", endTime = " + endTime +
             ", transfer = " + transfer +
-            ", remark = " + remark +
+            ", endTime = " + endTime +
             ", createTime = " + createTime +
             ", createBy = " + createBy +
             ", updateTime = " + updateTime +
             ", updateBy = " + updateBy +
+            ", remark = " + remark +
+            ", delFlag = " + delFlag +
+            ", province = " + province +
+            ", city = " + city +
+            ", area = " + area +
+            ", courseId = " + courseId +
+            ", occupation = " + occupation +
+            ", education = " + education +
+            ", height = " + height +
+            ", weight = " + weight +
+            ", reason = " + reason +
+            ", hours = " + hours +
+            ", othenIntention = " + othenIntention +
+            ", clueId = " + clueId +
         "}";
     }
 }

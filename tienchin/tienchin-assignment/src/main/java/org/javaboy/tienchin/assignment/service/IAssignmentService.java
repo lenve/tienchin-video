@@ -1,7 +1,7 @@
-package org.javaboy.tienchin.clue.service;
+package org.javaboy.tienchin.assignment.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.javaboy.tienchin.clue.domain.Assignment;
+import org.javaboy.tienchin.assignment.domain.Assignment;
 import org.javaboy.tienchin.common.core.domain.AjaxResult;
 
 /**
