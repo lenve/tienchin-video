@@ -8,20 +8,23 @@ export function listChannels(query) {
         params: query
     })
 }
+
 // 根据id 查询线索摘要信息
-export function getClueSummaryById(clueId) {
+export function getAllCourse() {
     return request({
-        url: '/tienchin/clue/summary/' + clueId,
+        url: '/tienchin/business/all_course',
         method: 'get'
     })
 }
-// 查询渠道列表
-export function getClueById(clueId) {
+
+// 根据 ID 查询商机
+export function getBusinessById(businessId) {
     return request({
-        url: '/tienchin/clue/'+clueId,
+        url: '/tienchin/business/'+businessId,
         method: 'get'
     })
 }
+
 // 查询活动列表
 export function listActivity(channelId) {
     return request({
@@ -38,26 +41,19 @@ export function listBusiness(query) {
         params: query
     })
 }
-// 根据部门查询用户列表
-export function listUsers(deptId) {
+
+// 查询商机的跟进记录
+export function getBusinessRecordByBusinessId(clueId) {
     return request({
-        url: '/tienchin/clue/users/'+deptId,
+        url: '/tienchin/follow/record/business/' + clueId,
         method: 'get'
     })
 }
 
-// 查询角色详细
-export function getActivity(activityId) {
+// 根据课程的类型查询课程
+export function getCourseByType(type) {
     return request({
-        url: '/tienchin/activity/' + activityId,
-        method: 'get'
-    })
-}
-
-// 查询线索的跟进记录
-export function getClueRecordByClueId(clueId) {
-    return request({
-        url: '/tienchin/clue/follow/record/' + clueId,
+        url: '/tienchin/business/course/' + type,
         method: 'get'
     })
 }
@@ -71,25 +67,10 @@ export function addBusiness(data) {
     })
 }
 
-// 线索转为商机
-export function clue2Business(clueId) {
+// 跟进商机
+export function businessFollow(data) {
     return request({
-        url: '/tienchin/clue/to_business/'+clueId,
-        method: 'post'
-    })
-}
-
-export function invalidClue(data) {
-    return request({
-        url: '/tienchin/clue/invalid',
-        method: 'post',
-        data: data
-    })
-}
-// 新增线索
-export function clueFollow(data) {
-    return request({
-        url: '/tienchin/clue/follow',
+        url: '/tienchin/business/follow',
         method: 'post',
         data: data
     })
@@ -102,20 +83,25 @@ export function assignBusiness(data) {
         data: data
     })
 }
-
-// 修改角色
-export function updateClue(data) {
+// 更新商机
+export function updateBusiness(data) {
     return request({
-        url: '/tienchin/clue',
+        url: '/tienchin/business',
         method: 'put',
         data: data
     })
 }
-
-// 删除角色
-export function delClue(clueIds) {
+// 根据商机的 ID 查询商机的摘要信息
+export function getBusinessSummaryById(businessId) {
     return request({
-        url: '/tienchin/clue/' + clueIds,
+        url: '/tienchin/business/summary/'+businessId,
+        method: 'get'
+    })
+}
+// 根据商机的 ID 删除商机
+export function deleteBusinessByIds(businessIds) {
+    return request({
+        url: '/tienchin/business/'+businessIds,
         method: 'delete'
     })
 }

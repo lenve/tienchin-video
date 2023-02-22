@@ -27,20 +27,16 @@ public class AssignmentServiceImpl extends ServiceImpl<AssignmentMapper, Assignm
     @Override
     @Transactional
     public AjaxResult assignClue(Assignment assignment) {
-        try {
-            //1. 先将一个线索的所有分配记录中的 latest 属性设置为 false
-            UpdateWrapper<Assignment> uw = new UpdateWrapper<>();
-            uw.lambda().set(Assignment::getLatest, false).eq(Assignment::getAssignId, assignment.getAssignId());
-            update(uw);
-            //2。 分配线索
+        //1. 先将一个线索的所有分配记录中的 latest 属性设置为 false
+        UpdateWrapper<Assignment> uw = new UpdateWrapper<>();
+        uw.lambda().set(Assignment::getLatest, false).eq(Assignment::getAssignId, assignment.getAssignId());
+        update(uw);
+        //2。 分配线索
 //            assignment.setType(TienChinConstants.CLUE_TYPE);
-            assignment.setCreateBy(SecurityUtils.getUsername());
-            assignment.setCreateTime(LocalDateTime.now());
-            assignment.setLatest(true);
-            save(assignment);
-            return AjaxResult.success("线索分配成功");
-        } catch (Exception e) {
-            return AjaxResult.error("分配线索失败：" + e.getMessage());
-        }
+        assignment.setCreateBy(SecurityUtils.getUsername());
+        assignment.setCreateTime(LocalDateTime.now());
+        assignment.setLatest(true);
+        save(assignment);
+        return AjaxResult.success("线索分配成功");
     }
 }

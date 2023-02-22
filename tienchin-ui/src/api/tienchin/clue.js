@@ -57,7 +57,7 @@ export function getActivity(activityId) {
 // 查询线索的跟进记录
 export function getClueRecordByClueId(clueId) {
     return request({
-        url: '/tienchin/clue/follow/record/' + clueId,
+        url: '/tienchin/follow/record/clue/' + clueId,
         method: 'get'
     })
 }

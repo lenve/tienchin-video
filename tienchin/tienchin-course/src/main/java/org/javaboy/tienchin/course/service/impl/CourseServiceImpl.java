@@ -1,5 +1,6 @@
 package org.javaboy.tienchin.course.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.javaboy.tienchin.common.core.domain.AjaxResult;
 import org.javaboy.tienchin.common.utils.SecurityUtils;
@@ -56,5 +57,13 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         UpdateWrapper<Course> uw = new UpdateWrapper<>();
         uw.lambda().set(Course::getDelFlag, 1).in(Course::getCourseId, courseIds);
         return update(uw);
+    }
+
+    @Override
+    public AjaxResult getCourseByCourseType(Integer type) {
+        QueryWrapper<Course> qw = new QueryWrapper<>();
+        qw.lambda().eq(Course::getType, type);
+        List<Course> list = list(qw);
+        return AjaxResult.success(list);
     }
 }

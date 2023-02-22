@@ -1,7 +1,8 @@
-package org.javaboy.tienchin.clue.mapper;
+package org.javaboy.tienchin.follow.mapper;
 
-import org.javaboy.tienchin.clue.domain.FollowRecord;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.javaboy.tienchin.follow.domain.FollowRecord;
 
 /**
  * <p>

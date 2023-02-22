@@ -159,6 +159,8 @@ public class Business implements Serializable {
      */
     private String occupation;
 
+    private Double money;
+
     /**
      * 学历
      */
@@ -224,6 +226,14 @@ public class Business implements Serializable {
 
     public void setActivityId(Integer activityId) {
         this.activityId = activityId;
+    }
+
+    public Double getMoney() {
+        return money;
+    }
+
+    public void setMoney(Double money) {
+        this.money = money;
     }
 
     public Integer getGender() {

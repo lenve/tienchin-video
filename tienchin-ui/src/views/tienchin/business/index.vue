@@ -20,38 +20,10 @@
       <el-form-item label="归属人" prop="owner">
         <el-input
             v-model="queryParams.owner"
-            placeholder="请输入线索归属人"
+            placeholder="请输入商机归属人"
             clearable
             @keyup.enter="handleQuery"
         />
-      </el-form-item>
-      <el-form-item label="渠道来源" prop="channelId">
-        <el-select
-            v-model="queryParams.channelId"
-            placeholder="渠道来源"
-            clearable
-        >
-          <el-option
-              v-for="cl in channelList"
-              :key="cl.channelId"
-              :label="cl.channelName"
-              :value="cl.channelId"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="线索状态" prop="status">
-        <el-select
-            v-model="queryParams.status"
-            placeholder="线索状态"
-            clearable
-        >
-          <el-option
-              v-for="cs in business_status"
-              :key="cs.value"
-              :label="cs.label"
-              :value="cs.value"
-          />
-        </el-select>
       </el-form-item>
       <el-form-item label="跟进时间">
         <el-date-picker
@@ -175,7 +147,7 @@
     />
 
     <!-- 分配商机对话框 -->
-    <el-dialog title="分配线索" v-model="assignBusinessDialog" width="700px" append-to-body>
+    <el-dialog title="分配商机" v-model="assignBusinessDialog" width="700px" append-to-body>
       <el-form ref="businessAssignRef" :model="assignForm" :rules="assignFormRules" label-width="80px">
         <el-row>
           <el-col :span="12">
@@ -218,7 +190,7 @@
         </div>
       </template>
     </el-dialog>
-    <!-- 添加或修改线索对话框 -->
+    <!-- 添加或修改商机对话框 -->
     <el-dialog :title="title" v-model="open" width="700px" append-to-body>
       <el-form ref="businessRef" :model="form" :rules="rules" label-width="80px">
         <el-row>
@@ -325,7 +297,7 @@ import {
   delClue
 } from "../../../api/tienchin/clue";
 
-import {listBusiness,listActivity,listChannels,addBusiness,assignBusiness} from "../../../api/tienchin/business";
+import {listBusiness,listActivity,listChannels,addBusiness,assignBusiness,getBusinessSummaryById,updateBusiness,deleteBusinessByIds} from "../../../api/tienchin/business";
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -341,6 +313,7 @@ const assignBusinessDialog = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
+const names = ref([]);
 const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
@@ -358,9 +331,7 @@ const data = reactive({
     name: undefined,
     phone: undefined,
     owner: undefined,
-    channelId: undefined,
-    dateRange: undefined,
-    status: undefined
+    dateRange: undefined
   },
   rules: {
     phone: [{required: true, message: "手机号码不能为空", trigger: "blur"}],
@@ -388,7 +359,7 @@ function resetAssignForm() {
 }
 
 /**
- * 分配线索的方法
+ * 分配商机的方法
  */
 function handleAssignClue() {
   proxy.$refs["businessAssignRef"].validate(valid => {
@@ -410,11 +381,11 @@ function assignUserChange(data) {
 }
 
 function handleClueView(data) {
-  router.push("/clue/details/index/" + data.clueId + "/view");
+  router.push("/business/details/index/" + data.businessId + "/view");
 }
 
 function handleClueFollow(data) {
-  router.push("/clue/details/index/" + data.clueId + "/follow");
+  router.push("/business/details/index/" + data.businessId + "/follow");
 }
 
 function deptChange() {
@@ -456,7 +427,7 @@ function getAllChannels() {
   })
 }
 
-/** 查询线索列表 */
+/** 查询商机列表 */
 function getList() {
   loading.value = true;
   listBusiness(proxy.addDateRange(queryParams.value, queryParams.value.dateRange)).then(response => {
@@ -496,12 +467,14 @@ function handleQuery() {
 /** 重置按钮操作 */
 function resetQuery() {
   proxy.resetForm("queryRef");
+  queryParams.value.dateRange = undefined;
   handleQuery();
 }
 
 /** 多选框选中数据 */
 function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.clueId);
+  ids.value = selection.map(item => item.businessId);
+  names.value = selection.map(item => item.name);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }
@@ -510,7 +483,7 @@ function handleSelectionChange(selection) {
 function handleAdd() {
   reset();
   open.value = true;
-  title.value = "添加线索";
+  title.value = "添加商机";
 }
 
 getAllChannels();
@@ -519,14 +492,14 @@ getAllChannels();
 function handleUpdate() {
   reset();
   getAllChannels();
-  const clueId = ids.value;
-  getClueSummaryById(clueId).then(response => {
+  const businessId = ids.value;
+  getBusinessSummaryById(businessId).then(response => {
     form.value = response.data;
     listActivity(response.data.channelId).then(response => {
       activityList.value = response.data;
     })
     open.value = true;
-    title.value = "修改线索";
+    title.value = "修改商机";
   });
 }
 
@@ -534,8 +507,8 @@ function handleUpdate() {
 function submitForm() {
   proxy.$refs["businessRef"].validate(valid => {
     if (valid) {
-      if (form.value.clueId != undefined) {
-        updateClue(form.value).then(response => {
+      if (form.value.businessId != undefined) {
+        updateBusiness(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
@@ -553,9 +526,10 @@ function submitForm() {
 
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const clueIds = ids.value;
-  proxy.$modal.confirm('是否确认删除线索编号为"' + clueIds + '"的数据项？').then(function () {
-    return delClue(clueIds);
+  const businessIds = ids.value;
+  const businessNames = names.value;
+  proxy.$modal.confirm('是否确认删客户姓名为"' + businessNames + '"的数据项？').then(function () {
+    return deleteBusinessByIds(businessIds);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");

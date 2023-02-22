@@ -24,4 +24,6 @@ public interface ICourseService extends IService<Course> {
     AjaxResult updateCourse(Course course);
 
     boolean deleteCourseByIds(Long[] courseIds);
+
+    AjaxResult getCourseByCourseType(Integer type);
 }
