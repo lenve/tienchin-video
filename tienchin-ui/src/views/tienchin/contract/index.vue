@@ -49,7 +49,7 @@
             plain
             icon="Plus"
             @click="handleAdd"
-            v-hasPermi="['tienchin:clue:create']"
+            v-hasPermi="['tienchin:contract:create']"
         >新增
         </el-button>
       </el-col>
@@ -60,7 +60,7 @@
             icon="Edit"
             :disabled="single"
             @click="handleUpdate"
-            v-hasPermi="['tienchin:clue:edit']"
+            v-hasPermi="['tienchin:contract:edit']"
         >修改
         </el-button>
       </el-col>
@@ -71,7 +71,7 @@
             icon="Delete"
             :disabled="multiple"
             @click="handleDelete"
-            v-hasPermi="['tienchin:clue:remove']"
+            v-hasPermi="['tienchin:contract:remove']"
         >删除
         </el-button>
       </el-col>
@@ -81,58 +81,44 @@
             plain
             icon="Download"
             @click="handleExport"
-            v-hasPermi="['tienchin:clue:export']"
+            v-hasPermi="['tienchin:contract:export']"
         >导出
         </el-button>
       </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="businessList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="unapproveTaskList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
       <el-table-column label="客户姓名" align="center" :show-overflow-tooltip="true" width="120" prop="name"/>
       <el-table-column label="手机号码" align="center" :show-overflow-tooltip="true" width="120" prop="phone"/>
-      <el-table-column label="合同归属" align="center" :show-overflow-tooltip="true" width="120" prop="owner"/>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
-        <template #default="scope">
-          <span>{{ parseTime(scope.row.createTime) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="合同状态" align="center" width="150">
-        <template #default="scope">
-          <dict-tag :options="business_status" :value="scope.row.status"/>
-        </template>
-      </el-table-column>
-      <el-table-column label="下次跟进时间" align="center" prop="nextTime" width="180">
-        <template #default="scope">
-          <span>{{ parseTime(scope.row.nextTime) }}</span>
-        </template>
-      </el-table-column>
+      <el-table-column label="渠道名称" align="center" :show-overflow-tooltip="true" width="120" prop="channelName"/>
+      <el-table-column label="活动名称" align="center" :show-overflow-tooltip="true" width="120" prop="activityName"/>
+      <el-table-column label="课程名称" align="center" :show-overflow-tooltip="true" width="120" prop="courseName"/>
+      <el-table-column label="合同金额" align="center" :show-overflow-tooltip="true" width="120" prop="contractPrice"/>
 
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button
               type="text"
               icon="View"
-              @click="handleClueView(scope.row)"
-              v-hasPermi="['tienchin:clue:view']"
+              @click="handleContractDetails(scope.row)"
+              v-hasPermi="['tienchin:contract:details']"
           >查看
           </el-button>
           <el-button
-              v-if="scope.row.status==1"
               type="text"
-              icon="Pointer"
+              icon="Document"
               @click="handleAssign(scope.row)"
-              v-hasPermi="['tienchin:clue:assignment']"
-          >分配
+              v-hasPermi="['tienchin:contract:view']"
+          >预览
           </el-button>
           <el-button
-              v-if="scope.row.owner==userStore.name &&(scope.row.status==1||scope.row.status==2)"
               type="text"
               icon="TopRight"
               @click="handleClueFollow(scope.row)"
-              v-hasPermi="['tienchin:clue:follow']"
-          >跟进
+              v-hasPermi="['tienchin:contract:approve']"
+          >审批
           </el-button>
         </template>
       </el-table-column>
@@ -147,13 +133,184 @@
     />
 
     <!-- 分配合同对话框 -->
-    <el-dialog title="分配合同" v-model="assignBusinessDialog" width="700px" append-to-body>
-      <el-form ref="businessAssignRef" :model="assignForm" :rules="assignFormRules" label-width="80px">
+    <el-dialog title="合同详情" v-model="showContractDetailsDialog" width="700px" append-to-body>
+      <el-row :gutter="8">
+        <el-col :span="8">
+          <div>
+            <div style="font-weight: bold;font-style: italic">合同编号</div>
+            <div style="color: #8392a6">{{ contractDetails.contractId }}</div>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div style="font-weight: bold;font-style: italic">客户手机号码</div>
+          <div style="color: #8392a6">{{ contractDetails.phone }}</div>
+        </el-col>
+        <el-col :span="8">
+          <div style="font-weight: bold;font-style: italic">客户姓名</div>
+          <div style="color: #8392a6">{{ contractDetails.name }}</div>
+        </el-col>
+      </el-row>
+      <el-row :gutter="8">
+        <el-col :span="8">
+          <div>
+            <div style="font-weight: bold;font-style: italic">课程分类</div>
+            <div style="color: #8392a6">
+              <template v-for="dict in course_type">
+                <template v-if="dict.value==contractDetails.type">{{ dict.label }}</template>
+              </template>
+            </div>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div style="font-weight: bold;font-style: italic">课程名</div>
+          <div style="color: #8392a6">{{ contractDetails.courseName }}</div>
+        </el-col>
+        <el-col :span="8">
+          <div style="font-weight: bold;font-style: italic">渠道名称</div>
+          <div style="color: #8392a6">{{ contractDetails.channelName }}</div>
+        </el-col>
+      </el-row>
+      <el-row :gutter="8">
+        <el-col :span="8">
+          <div>
+            <div style="font-weight: bold;font-style: italic">活动名称</div>
+            <div style="color: #8392a6">{{ contractDetails.activityName }}</div>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div style="font-weight: bold;font-style: italic">合同状态</div>
+          <div style="color: #8392a6">
+            <template v-for="dict in contract_status">
+              <template v-if="dict.value==contractDetails.status">{{ dict.label }}</template>
+            </template>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div style="font-weight: bold;font-style: italic">合同金额</div>
+          <div style="color: #8392a6">{{ contractDetails.contractPrice }}</div>
+        </el-col>
+      </el-row>
+      <el-row :gutter="8">
+        <el-col :span="8">
+          <div>
+            <div style="font-weight: bold;font-style: italic">课程价格</div>
+            <div style="color: #8392a6">{{ contractDetails.coursePrice }}</div>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div style="font-weight: bold;font-style: italic">折扣类型</div>
+          <div style="color: #8392a6">
+            <template v-for="dict in activity_type">
+              <template v-if="dict.value==contractDetails.discountType">{{ dict.label }}</template>
+            </template>
+          </div>
+        </el-col>
+        <el-col :span="8">
+          <div style="font-weight: bold;font-style: italic">合同审批人</div>
+          <div style="color: #8392a6">{{ contractDetails.approveUserName }}</div>
+        </el-col>
+      </el-row>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="showContractDetailsDialog=false">确 定</el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <!-- 添加或修改合同对话框 -->
+    <el-dialog :title="title" v-model="open" width="700px" append-to-body>
+      <el-form ref="businessRef" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="归属部门" prop="departmentId">
+            <el-form-item label="手机号码" prop="phone">
+              <el-input v-model="form.phone" @input="phoneChange" placeholder="请输入手机号码"/>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="客户姓名" prop="name">
+              <el-input v-model="form.name" placeholder="请输入客户姓名" disabled/>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="渠道来源" prop="channelId">
+              <el-select
+                  v-model="form.channelName"
+                  placeholder="渠道来源"
+                  style="width: 100%"
+                  disabled
+                  clearable
+                  @change="channelChange"
+              >
+                <el-option
+                    v-for="cl in channelList"
+                    :key="cl.channelId"
+                    :label="cl.channelName"
+                    :value="{value:cl.channelId,channelName:cl.channelName}"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="活动信息" prop="activityId">
+              <el-select
+                  v-model="form.activityName"
+                  placeholder="活动信息"
+                  style="width: 100%"
+                  disabled
+                  @change="activityChange"
+                  clearable
+              >
+                <el-option
+                    v-for="al in activityList"
+                    :key="al.activityId"
+                    :label="al.name"
+                    :value="{value:al.activityId,activityName:al.name,discountType:al.type}"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="课程分类" prop="type">
+              <el-select
+                  v-model="form.type"
+                  placeholder="课程分类"
+                  disabled
+                  clearable
+                  style="width: 100%"
+                  @change="courseTypeChange"
+              >
+                <el-option
+                    v-for="ct in course_type"
+                    :key="ct.value"
+                    :label="ct.label"
+                    :value="parseInt(ct.value)"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="购买课程" prop="weixin">
+              <el-select v-model="form.courseName" style="width: 100%" placeholder="请选择" disabled
+                         @change="courseChange">
+                <el-option
+                    v-for="c in courses"
+                    :key="c.courseId"
+                    :label="c.name"
+                    :value="{value:c.courseId,courseName:c.name}"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="审批部门" prop="departmentId">
               <el-tree-select
-                  v-model="assignForm.departmentId"
+                  style="width: 100%"
+                  v-model="form.departmentId"
                   :data="deptOptions"
                   :props="{ value: 'id', label: 'label', children: 'children' }"
                   value-key="id"
@@ -164,13 +321,13 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="分配给" prop="nickName">
+            <el-form-item label="审批人" prop="nickName">
               <el-select
-                  v-model="assignForm.nickName"
+                  v-model="form.nickName"
                   placeholder="选择用户"
                   clearable
-                  @change="assignUserChange"
-                  style="width: 240px"
+                  @change="approveUserChange"
+                  style="width:100%"
               >
                 <el-option
                     v-for="ul in userList"
@@ -182,104 +339,23 @@
             </el-form-item>
           </el-col>
         </el-row>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button type="primary" @click="handleAssignClue">确 定</el-button>
-          <el-button @click="cancelAssignClue">取 消</el-button>
-        </div>
-      </template>
-    </el-dialog>
-    <!-- 添加或修改合同对话框 -->
-    <el-dialog :title="title" v-model="open" width="700px" append-to-body>
-      <el-form ref="businessRef" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="手机号码" prop="phone">
-              <el-input v-model="form.phone" placeholder="请输入手机号码"/>
+            <el-form-item label="合同价格" prop="contractPrice">
+              <el-input-number style="width: 100%" v-model="form.contractPrice" placeholder="合同价格"
+                               :precision="2" :min="0" :step="100"/>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
-            <el-form-item label="客户姓名" prop="name">
-              <el-input v-model="form.name" placeholder="请输入客户姓名"/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="渠道来源" prop="channelId">
-              <el-select
-                  v-model="form.channelId"
-                  placeholder="渠道来源"
-                  clearable
-                  @change="channelChange"
-                  style="width: 240px"
-              >
-                <el-option
-                    v-for="cl in channelList"
-                    :key="cl.channelId"
-                    :label="cl.channelName"
-                    :value="cl.channelId"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="活动信息" prop="activityId">
-              <el-select
-                  v-model="form.activityId"
-                  placeholder="活动信息"
-                  clearable
-                  style="width: 240px"
-              >
-                <el-option
-                    v-for="al in activityList"
-                    :key="al.activityId"
-                    :label="al.name"
-                    :value="al.activityId"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-              <el-form-item label="课程分类" prop="type">
-                <el-select
-                    v-model="form.type"
-                    placeholder="课程分类"
-                    clearable
-                    @change="courseTypeChange"
-                    style="width: 240px"
-                >
-                  <el-option
-                      v-for="ct in course_type"
-                      :key="ct.value"
-                      :label="ct.label"
-                      :value="parseInt(ct.value)"
-                  />
-                </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="购买课程" prop="weixin">
-              <el-select v-model="form.courseId" style="width: 100%" placeholder="请选择">
-                <el-option
-                    v-for="c in courses"
-                    :key="c.courseId"
-                    :label="c.name"
-                    :value="c.courseId"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
           <el-col :span="12">
             <el-form-item label="合同原件" prop="qq">
               <el-upload
                   v-model:file-list="fileList"
-                  action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                  :headers="headersObj"
+                  action="/dev-api/tienchin/contract/upload"
+                  :on-success="handleSuccess"
+                  :limit="1"
+                  :before-upload="handleBeforeUpload"
+                  :before-remove="handleBeforeRemove"
                   :on-remove="handleRemove"
               >
                 <el-button type="primary">选择合同原件</el-button>
@@ -306,7 +382,7 @@
 <script setup name="Post">
 import useUserStore from '@/store/modules/user'
 import {treeselect} from "@/api/system/dept";
-import {listUsers} from "../../../api/tienchin/clue";
+import {getToken} from '@/utils/auth'
 
 import {
   addBusiness,
@@ -320,12 +396,17 @@ import {
   updateBusiness
 } from "../../../api/tienchin/business";
 
-const fileList = ref([
-  {
-    name: 'element-plus-logo.svg',
-    url: 'https://element-plus.org/images/element-plus-logo.svg',
-  }
-])
+import {
+  deleteContractFile,
+  addContract,
+  listUsers,
+  getCustomerNameByPhone,
+  getContractDetailsById,
+  getCurrentUserUnapproveTask
+} from "../../../api/tienchin/contract";
+import {delCourse} from "../../../api/tienchin/course";
+
+const fileList = ref([])
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -334,15 +415,17 @@ const {
   business_status,
   course_apply_to,
   course_type,
+  contract_status,
+  activity_type,
   sys_user_sex
-} = proxy.useDict("business_status", "course_apply_to","course_type", "sys_user_sex");
+} = proxy.useDict("business_status", "course_apply_to", "contract_status", "activity_type", "course_type", "sys_user_sex");
 
-const businessList = ref([]);
+const unapproveTaskList = ref([]);
 const channelList = ref([]);
 const userList = ref([]);
 const activityList = ref([]);
 const open = ref(false);
-const assignBusinessDialog = ref(false);
+const showContractDetailsDialog = ref(false);
 const loading = ref(true);
 const showSearch = ref(true);
 const ids = ref([]);
@@ -352,8 +435,12 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
+const headersObj = ref({
+  "Authorization": 'Bearer ' + getToken()
+});
 
 const deptOptions = ref(undefined);
+const contractDetails = ref({});
 
 
 const data = reactive({
@@ -370,6 +457,7 @@ const data = reactive({
   rules: {
     phone: [{required: true, message: "手机号码不能为空", trigger: "blur"}],
     name: [{required: true, message: "客户姓名不能为空", trigger: "blur"}],
+    contractPrice: [{required: true, message: "合同金额不能为空", trigger: "blur"}],
   },
   assignFormRules: {
     departmentId: [{required: true, message: "部门ID不能为空", trigger: "blur"}],
@@ -379,17 +467,72 @@ const data = reactive({
 
 const {queryParams, form, assignForm, rules, assignFormRules} = toRefs(data);
 
-function handleRemove() {
-
+function phoneChange(val) {
+  if (val.length == 11) {
+    //说明手机号码输入完成，此时根据手机号码去查询客户名
+    getCustomerNameByPhone(val).then(response => {
+      let data = response.data;
+      form.value.name = data.name;
+      form.value.channelId = data.channelId;
+      form.value.channelName = data.channelName;
+      form.value.activityId = data.activityId;
+      form.value.activityName = data.activityName;
+      form.value.courseId = data.courseId;
+      form.value.courseName = data.courseName;
+      form.value.type = data.type;
+      form.value.discountType = data.discountType;
+    })
+  }
 }
+
+function activityChange(data) {
+  form.value.activityId = data.value;
+  form.value.activityName = data.activityName;
+  form.value.discountType = data.discountType;
+}
+
+function courseChange(data) {
+  form.value.courseId = data.value;
+  form.value.courseName = data.courseName;
+}
+
+/**
+ * 删除文件
+ *
+ * 可以在这个方法中去服务端删除文件，删除成功就返回 true，则前端页面的文件也会被删除；删除失败就返回 false，则前端页面的文件就不会被删除
+ * @param uploadFile
+ * @param uploadFiles
+ */
+function handleBeforeRemove(uploadFile, uploadFiles) {
+  let fileName = uploadFile.response.data.url.split("tienchin/contract/views/")[1];
+  return deleteContractFile(fileName);
+}
+
+function handleBeforeUpload(file) {
+  let isLimit = file.size / 1024 / 1024 < 5;
+  if (!isLimit) {
+    proxy.$modal.msgError("文件大小超过限制，上传失败");
+    fileList.value.splice(0, fileList.value.length)
+  }
+  return isLimit;
+}
+
+function handleRemove() {
+}
+
+function handleSuccess(response, uploadFile, uploadFiles) {
+  form.value.filePath = response.data.url;
+}
+
 function courseTypeChange(type) {
   form.value.courseId = undefined;
   getCourseByType(type).then(response => {
     courses.value = response.data;
   })
 }
+
 function cancelAssignClue() {
-  assignBusinessDialog.value = false;
+  showContractDetailsDialog.value = false;
   resetAssignForm();
 }
 
@@ -409,22 +552,25 @@ function handleAssignClue() {
     if (valid) {
       assignBusiness(assignForm.value).then(response => {
         getList();
-        assignBusinessDialog.value = false;
+        showContractDetailsDialog.value = false;
         resetAssignForm();
       })
     }
   });
 }
 
-function assignUserChange(data) {
-  assignForm.value.nickName = data.nickName;
-  assignForm.value.userId = data.value;
-  assignForm.value.userName = data.userName;
-  assignForm.value.deptId = data.deptId;
+function approveUserChange(data) {
+  form.value.nickName = data.nickName;
+  form.value.approveUserId = data.value;
+  form.value.approveUserName = data.userName;
+  form.value.approveDeptId = data.deptId;
 }
 
-function handleClueView(data) {
-  router.push("/business/details/index/" + data.businessId + "/view");
+function handleContractDetails(data) {
+  showContractDetailsDialog.value = true;
+  getContractDetailsById(data.contractId).then(response => {
+    contractDetails.value = response.data;
+  })
 }
 
 function handleClueFollow(data) {
@@ -432,12 +578,12 @@ function handleClueFollow(data) {
 }
 
 function deptChange() {
-  assignForm.value.nickName = undefined;
+  form.value.nickName = undefined;
   initUsers();
 }
 
 function initUsers() {
-  listUsers(assignForm.value.departmentId).then(response => {
+  listUsers(form.value.departmentId).then(response => {
     userList.value = response.data;
   })
 }
@@ -446,7 +592,7 @@ function handleAssign(data) {
   assignForm.value.assignId = data.businessId;
   assignForm.value.type = 1;
   initDeptOptions();
-  assignBusinessDialog.value = true;
+  showContractDetailsDialog.value = true;
 }
 
 function initDeptOptions() {
@@ -457,9 +603,11 @@ function initDeptOptions() {
   }
 }
 
-function channelChange(channelId) {
+function channelChange(data) {
+  form.value.channelName = data.channelName;
+  form.value.channelId = data.value;
   form.value.activityId = undefined;
-  listActivity(channelId).then(response => {
+  listActivity(data.value).then(response => {
     activityList.value = response.data;
   })
 }
@@ -473,8 +621,8 @@ function getAllChannels() {
 /** 查询合同列表 */
 function getList() {
   loading.value = true;
-  listBusiness(proxy.addDateRange(queryParams.value, queryParams.value.dateRange)).then(response => {
-    businessList.value = response.rows;
+  getCurrentUserUnapproveTask(proxy.addDateRange(queryParams.value, queryParams.value.dateRange)).then(response => {
+    unapproveTaskList.value = response.rows;
     total.value = response.total;
     loading.value = false;
   });
@@ -492,11 +640,18 @@ function reset() {
     phone: undefined,
     name: undefined,
     channelId: undefined,
+    channelName: undefined,
     activityId: undefined,
-    gender: undefined,
-    age: undefined,
-    weixin: undefined,
-    qq: undefined
+    activityName: undefined,
+    type: undefined,
+    courseName: undefined,
+    courseId: undefined,
+    approveDeptId: undefined,
+    approveUserId: undefined,
+    approveUserName: undefined,
+    nickName: undefined,
+    filePath: undefined,
+    contractPrice: undefined
   };
   proxy.resetForm("businessRef");
 }
@@ -525,6 +680,7 @@ function handleSelectionChange(selection) {
 /** 新增按钮操作 */
 function handleAdd() {
   reset();
+  initDeptOptions();
   open.value = true;
   title.value = "添加合同";
 }
@@ -557,7 +713,7 @@ function submitForm() {
           getList();
         });
       } else {
-        addBusiness(form.value).then(response => {
+        addContract(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
           getList();

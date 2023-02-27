@@ -33,4 +33,5 @@ public interface IBusinessService extends IService<Business> {
     AjaxResult updateBusiness(BusinessSummaryEnhance businessSummaryEnhance);
 
     AjaxResult deleteBusinessById(Integer[] businessIds);
+
 }

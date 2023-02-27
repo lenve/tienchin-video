@@ -1,20 +1,23 @@
 package org.javaboy.tienchin.framework.web.exception;
 
-import javax.servlet.http.HttpServletRequest;
-
+import org.javaboy.tienchin.common.constant.HttpStatus;
 import org.javaboy.tienchin.common.core.domain.AjaxResult;
+import org.javaboy.tienchin.common.exception.DemoModeException;
+import org.javaboy.tienchin.common.exception.ServiceException;
 import org.javaboy.tienchin.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.javaboy.tienchin.common.constant.HttpStatus;
-import org.javaboy.tienchin.common.exception.DemoModeException;
-import org.javaboy.tienchin.common.exception.ServiceException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 全局异常处理器

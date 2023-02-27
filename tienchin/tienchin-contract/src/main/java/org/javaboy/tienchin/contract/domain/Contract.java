@@ -33,12 +33,12 @@ public class Contract implements Serializable {
     /**
      * 客户姓名
      */
-    private Integer name;
+    private String name;
 
     /**
      * 课程分类
      */
-    private String type;
+    private Integer type;
 
     /**
      * 活动 ID
@@ -83,12 +83,12 @@ public class Contract implements Serializable {
     /**
      * 合同价格
      */
-    private Object contractPrice;
+    private Double contractPrice;
 
     /**
      * 课程价格
      */
-    private Object coursePrice;
+    private Double coursePrice;
 
     /**
      * 折扣类型
@@ -117,6 +117,43 @@ public class Contract implements Serializable {
 
     private Integer delFlag;
 
+    private Integer approveDeptId;
+    private String approveDeptName;
+    private Integer approveUserId;
+    private String approveUserName;
+
+    public Integer getApproveDeptId() {
+        return approveDeptId;
+    }
+
+    public void setApproveDeptId(Integer approveDeptId) {
+        this.approveDeptId = approveDeptId;
+    }
+
+    public String getApproveDeptName() {
+        return approveDeptName;
+    }
+
+    public void setApproveDeptName(String approveDeptName) {
+        this.approveDeptName = approveDeptName;
+    }
+
+    public Integer getApproveUserId() {
+        return approveUserId;
+    }
+
+    public void setApproveUserId(Integer approveUserId) {
+        this.approveUserId = approveUserId;
+    }
+
+    public String getApproveUserName() {
+        return approveUserName;
+    }
+
+    public void setApproveUserName(String approveUserName) {
+        this.approveUserName = approveUserName;
+    }
+
     public Integer getContractId() {
         return contractId;
     }
@@ -133,19 +170,19 @@ public class Contract implements Serializable {
         this.phone = phone;
     }
 
-    public Integer getName() {
+    public String getName() {
         return name;
     }
 
-    public void setName(Integer name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 
@@ -213,19 +250,19 @@ public class Contract implements Serializable {
         this.filePath = filePath;
     }
 
-    public Object getContractPrice() {
+    public Double getContractPrice() {
         return contractPrice;
     }
 
-    public void setContractPrice(Object contractPrice) {
+    public void setContractPrice(Double contractPrice) {
         this.contractPrice = contractPrice;
     }
 
-    public Object getCoursePrice() {
+    public Double getCoursePrice() {
         return coursePrice;
     }
 
-    public void setCoursePrice(Object coursePrice) {
+    public void setCoursePrice(Double coursePrice) {
         this.coursePrice = coursePrice;
     }
 
@@ -304,29 +341,33 @@ public class Contract implements Serializable {
     @Override
     public String toString() {
         return "Contract{" +
-            "contractId = " + contractId +
-            ", phone = " + phone +
-            ", name = " + name +
-            ", type = " + type +
-            ", activityId = " + activityId +
-            ", activityName = " + activityName +
-            ", courseId = " + courseId +
-            ", courseName = " + courseName +
-            ", channelId = " + channelId +
-            ", channelName = " + channelName +
-            ", status = " + status +
-            ", filePath = " + filePath +
-            ", contractPrice = " + contractPrice +
-            ", coursePrice = " + coursePrice +
-            ", discountType = " + discountType +
-            ", processInstanceId = " + processInstanceId +
-            ", businessId = " + businessId +
-            ", createBy = " + createBy +
-            ", createTime = " + createTime +
-            ", updateBy = " + updateBy +
-            ", updateTime = " + updateTime +
-            ", remark = " + remark +
-            ", delFlag = " + delFlag +
-        "}";
+                "contractId=" + contractId +
+                ", phone='" + phone + '\'' +
+                ", name=" + name +
+                ", type='" + type + '\'' +
+                ", activityId=" + activityId +
+                ", activityName='" + activityName + '\'' +
+                ", courseId=" + courseId +
+                ", courseName='" + courseName + '\'' +
+                ", channelId=" + channelId +
+                ", channelName='" + channelName + '\'' +
+                ", status=" + status +
+                ", filePath='" + filePath + '\'' +
+                ", contractPrice=" + contractPrice +
+                ", coursePrice=" + coursePrice +
+                ", discountType=" + discountType +
+                ", processInstanceId='" + processInstanceId + '\'' +
+                ", businessId=" + businessId +
+                ", createBy='" + createBy + '\'' +
+                ", createTime=" + createTime +
+                ", updateBy='" + updateBy + '\'' +
+                ", updateTime=" + updateTime +
+                ", remark='" + remark + '\'' +
+                ", delFlag=" + delFlag +
+                ", approveDeptId=" + approveDeptId +
+                ", approveDeptName='" + approveDeptName + '\'' +
+                ", approveUserId=" + approveUserId +
+                ", approveUserName='" + approveUserName + '\'' +
+                '}';
     }
 }

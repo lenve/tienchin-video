@@ -25,6 +25,14 @@
             <artifactId>tienchin-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.javaboy</groupId>
+            <artifactId>tienchin-business</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.javaboy</groupId>
+            <artifactId>tienchin-course</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter</artifactId>
             <version>6.7.2</version>
