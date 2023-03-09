@@ -10,6 +10,26 @@ public class ContractSummary {
     private String channelName;
     private String activityName;
 
+    private String reason;
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    private String filePath;
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
     public Integer getContractId() {
         return contractId;
     }

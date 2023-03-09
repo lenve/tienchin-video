@@ -18,6 +18,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-words</artifactId>
+            <version>21.8</version>
+            <type>pom</type>
+        </dependency>
 
         <!-- 通用工具-->
         <dependency>
@@ -38,4 +44,12 @@
             <version>6.7.2</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>aspose</id>
+            <name>aspose</name>
+            <url>https://repository.aspose.com/repo/</url>
+        </repository>
+    </repositories>
 </project>

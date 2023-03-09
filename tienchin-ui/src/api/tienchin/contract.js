@@ -20,7 +20,7 @@ export function getAllCourse() {
 // 根据 ID 查询商机
 export function getBusinessById(businessId) {
     return request({
-        url: '/tienchin/business/'+businessId,
+        url: '/tienchin/business/' + businessId,
         method: 'get'
     })
 }
@@ -28,7 +28,7 @@ export function getBusinessById(businessId) {
 // 查询活动列表
 export function listActivity(channelId) {
     return request({
-        url: '/tienchin/business/activity/'+channelId,
+        url: '/tienchin/business/activity/' + channelId,
         method: 'get'
     })
 }
@@ -61,7 +61,7 @@ export function getCourseByType(type) {
 // 根据部门查询用户列表
 export function listUsers(deptId) {
     return request({
-        url: '/tienchin/contract/users/'+deptId,
+        url: '/tienchin/contract/users/' + deptId,
         method: 'get'
     })
 }
@@ -75,6 +75,7 @@ export function addBusiness(data) {
         data: data
     })
 }
+
 // 新增合同
 export function addContract(data) {
     return request({
@@ -92,6 +93,7 @@ export function businessFollow(data) {
         data: data
     })
 }
+
 // 线索分配
 export function assignBusiness(data) {
     return request({
@@ -100,6 +102,16 @@ export function assignBusiness(data) {
         data: data
     })
 }
+
+// 合同审批
+export function approveOrReject(data) {
+    return request({
+        url: '/tienchin/contract/approve',
+        method: 'post',
+        data: data
+    })
+}
+
 // 更新商机
 export function updateBusiness(data) {
     return request({
@@ -113,21 +125,29 @@ export function updateBusiness(data) {
 // 根据商机的 ID 查询商机的摘要信息
 export function getBusinessSummaryById(businessId) {
     return request({
-        url: '/tienchin/business/summary/'+businessId,
+        url: '/tienchin/business/summary/' + businessId,
         method: 'get'
     })
 }
-
 
 
 // 根据商机的 ID 查询商机的摘要信息
 export function getCustomerNameByPhone(phone) {
     return request({
-        url: '/tienchin/contract/customer/'+phone,
+        url: '/tienchin/contract/customer/' + phone,
         method: 'get'
     })
 }
 
+
+
+// 查询当前任务已经审批完成的合同信息
+export function getCurrentApprovedTask() {
+    return request({
+        url: '/tienchin/contract/approved',
+        method: 'get'
+    })
+}
 
 
 // 查询当前用户待审批的任务
@@ -138,6 +158,24 @@ export function getCurrentUserUnapproveTask() {
     })
 }
 
+
+
+// 查询当前用户已提交未审批的任务
+export function getCurrentUserCommittedTask() {
+    return request({
+        url: '/tienchin/contract/committed_task',
+        method: 'get'
+    })
+}
+
+
+// 查询当前用户待审批的任务
+export function getPdfFile(filename) {
+    return request({
+        url: '/tienchin/contract/views/' + filename,
+        method: 'get'
+    })
+}
 
 
 // 根据 ID 查询合同详细信息
@@ -152,14 +190,15 @@ export function getContractDetailsById(contractId) {
 // 根据商机的 ID 删除商机
 export function deleteBusinessByIds(businessIds) {
     return request({
-        url: '/tienchin/business/'+businessIds,
+        url: '/tienchin/business/' + businessIds,
         method: 'delete'
     })
 }
+
 // 删除合同原件
 export function deleteContractFile(fileName) {
     return request({
-        url: '/tienchin/contract/'+fileName,
+        url: '/tienchin/contract/' + fileName,
         method: 'delete'
     })
 }

@@ -1,19 +1,27 @@
 package org.javaboy.tienchin.contract.service.impl;
 
+import com.aspose.words.Document;
+import com.aspose.words.PdfCompliance;
+import com.aspose.words.PdfSaveOptions;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
-import org.flowable.common.engine.impl.identity.Authentication;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.javaboy.tienchin.business.domain.Business;
 import org.javaboy.tienchin.business.service.IBusinessService;
 import org.javaboy.tienchin.common.constant.TienChinConstants;
 import org.javaboy.tienchin.common.core.domain.AjaxResult;
 import org.javaboy.tienchin.common.core.domain.UploadFileResp;
 import org.javaboy.tienchin.common.utils.SecurityUtils;
+import org.javaboy.tienchin.common.utils.sign.Base64;
 import org.javaboy.tienchin.contract.domain.Contract;
+import org.javaboy.tienchin.contract.domain.vo.ContractApproveInfo;
 import org.javaboy.tienchin.contract.domain.vo.ContractInfo;
 import org.javaboy.tienchin.contract.domain.vo.ContractSummary;
 import org.javaboy.tienchin.contract.mapper.ContractMapper;
@@ -29,8 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -57,6 +64,9 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
 
     @Autowired
     TaskService taskService;
+
+    @Autowired
+    HistoryService historyService;
 
     @Value("${tienchin.contract.file}")
     String contractFolder;
@@ -132,7 +142,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         vars.put("contractId", contract.getContractId());
         vars.put("approveUser", contract.getApproveUserName());
         vars.put("approveUserId", contract.getApproveUserId());
-        Task task = taskService.createTaskQuery().taskAssignee(SecurityUtils.getUsername()).taskDefinitionKey("submitContractTask").singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId(), vars);
         //3。更新合同信息
         contract.setProcessInstanceId(processInstance.getProcessInstanceId());
@@ -161,10 +171,12 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         for (Task task : list) {
             String taskId = task.getId();
             Integer contractId = (Integer) taskService.getVariable(task.getId(), "contractId");
+            String reason = (String) taskService.getVariable(task.getId(), "reason");
             ContractSummary summary = new ContractSummary();
             Contract contract = getById(contractId);
             BeanUtils.copyProperties(contract, summary);
             summary.setTaskId(taskId);
+            summary.setReason(reason);
             result.add(summary);
         }
         return result;
@@ -174,5 +186,93 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
     public AjaxResult getContractById(Integer contractId) {
         Contract contract = getById(contractId);
         return AjaxResult.success(contract);
+    }
+
+    @Override
+    public AjaxResult showContractPDF(String year, String month, String day, String name) {
+        try {
+            //word 的文件完整路径
+            String docFilePath = contractFolder + File.separator + year + File.separator + month + File.separator + day + File.separator + name;
+            String pdfFilePath = docFilePath.replace(".docx", ".pdf").replace(".doc", ".pdf");
+            File pdfFile = new File(pdfFilePath);
+            if (!pdfFile.exists()) {
+                Document doc = new Document(docFilePath);
+                PdfSaveOptions options = new PdfSaveOptions();
+                options.setCompliance(PdfCompliance.PDF_17);
+                doc.save(pdfFilePath, options);
+            }
+            FileInputStream fis = new FileInputStream(pdfFilePath);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int len = 0;
+            byte[] buf = new byte[1024];
+            while ((len = fis.read(buf)) != -1) {
+                baos.write(buf, 0, len);
+            }
+            return AjaxResult.success(Base64.encode(baos.toByteArray()));
+        } catch (Exception e) {
+//            throw new RuntimeException(e);
+            return AjaxResult.error("未加载到 PDF 文件:" + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<ContractSummary> getCommittedTask() {
+        List<ContractSummary> result = new ArrayList<>();
+        //查询当前用户已经提交的任务
+        List<Execution> list = runtimeService.createExecutionQuery().variableValueEquals("currentUser", SecurityUtils.getUsername()).processDefinitionKey(TienChinConstants.CONTRACT_PROCESS_DEFINITION_ID).list();
+        for (Execution e : list) {
+            String eId = e.getId();
+            Integer contractId = (Integer) runtimeService.getVariable(e.getId(), "contractId");
+            String reason = (String) runtimeService.getVariable(e.getId(), "reason");
+            ContractSummary summary = new ContractSummary();
+            Contract contract = getById(contractId);
+            BeanUtils.copyProperties(contract, summary);
+            summary.setTaskId(eId);
+            summary.setReason(reason);
+            result.add(summary);
+        }
+        return result;
+    }
+
+    @Override
+    public AjaxResult approveOrReject(ContractApproveInfo contractApproveInfo) {
+        //流程审批
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("approve", contractApproveInfo.getApprove());
+        vars.put("reason", contractApproveInfo.getReason());
+        taskService.complete(contractApproveInfo.getTaskId(), vars);
+        //修改合同表中关于这条合同记录的状态
+        UpdateWrapper<Contract> uw = new UpdateWrapper<>();
+        if (contractApproveInfo.getApprove()) {
+            uw.lambda().set(Contract::getStatus, TienChinConstants.CONTRACT_APPROVED).eq(Contract::getContractId, contractApproveInfo.getContractId());
+        } else {
+            uw.lambda().set(Contract::getStatus, TienChinConstants.CONTRACT_REJECT).eq(Contract::getContractId, contractApproveInfo.getContractId());
+        }
+        update(uw);
+        return AjaxResult.success("审批完成");
+    }
+
+    @Override
+    public List<ContractSummary> approvedTask() {
+        List<ContractSummary> result = new ArrayList<>();
+        List<HistoricProcessInstance> list = historyService.createHistoricProcessInstanceQuery().variableValueEquals("currentUser", SecurityUtils.getUsername()).finished().list();
+        for (HistoricProcessInstance hpi : list) {
+            List<HistoricVariableInstance> varList = historyService.createHistoricVariableInstanceQuery().processInstanceId(hpi.getId()).list();
+            Integer contractId = null;
+            String reason = null;
+            for (HistoricVariableInstance hvi : varList) {
+                if ("contractId".equals(hvi.getVariableName())) {
+                    contractId = (Integer) hvi.getValue();
+                } else if ("reason".equals(hvi.getVariableName())) {
+                    reason = (String) hvi.getValue();
+                }
+            }
+            Contract contract = getById(contractId);
+            ContractSummary summary = new ContractSummary();
+            BeanUtils.copyProperties(contract, summary);
+            summary.setReason(reason);
+            result.add(summary);
+        }
+        return result;
     }
 }
