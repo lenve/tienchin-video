@@ -57,6 +57,12 @@ public class ContractController extends BaseController {
         return contractService.addContract(contract);
     }
 
+    @PreAuthorize("hasPermission('tienchin:contract:approve')")
+    @PutMapping
+    public AjaxResult updateContract(@RequestBody Contract contract) {
+        return contractService.updateContract(contract);
+    }
+
     @GetMapping("/users/{deptId}")
     @PreAuthorize("hasPermission('tienchin:contract:create')")
     public AjaxResult getUsersByDeptId(@PathVariable Long deptId) {

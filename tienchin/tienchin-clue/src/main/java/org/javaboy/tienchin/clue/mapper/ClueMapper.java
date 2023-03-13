@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.javaboy.tienchin.clue.domain.vo.ClueDetails;
 import org.javaboy.tienchin.clue.domain.vo.ClueSummary;
 import org.javaboy.tienchin.clue.domain.vo.ClueVO;
+import org.javaboy.tienchin.common.core.domain.model.EchartsPoint;
 
 import java.util.List;
 
@@ -21,4 +22,8 @@ public interface ClueMapper extends BaseMapper<Clue> {
     List<ClueSummary> selectClueList(ClueVO clueVO);
 
     ClueDetails getClueDetailsByClueId(Integer clueId);
+
+    List<EchartsPoint> increaseClue(ClueVO clueVO);
+
+    List<EchartsPoint> totalClue(ClueVO clueVO);
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="80px">
+<!--    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="80px">
       <el-form-item label="客户姓名" prop="name">
         <el-input
             v-model="queryParams.name"
@@ -40,7 +40,7 @@
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
       </el-form-item>
-    </el-form>
+    </el-form>-->
 
     <el-row :gutter="10" class="mb8">
       <el-col :span="1.5">
@@ -120,7 +120,7 @@
             <el-button
                 type="text"
                 icon="TopRight"
-                v-if="!scope.row.reason"
+                v-if="scope.row.approveUserName==userStore.name"
                 @click="showApproveContractDialog(scope.row)"
                 v-hasPermi="['tienchin:contract:approve']"
             >审批
@@ -128,8 +128,8 @@
             <el-button
                 type="text"
                 icon="TopRight"
-                v-if="scope.row.reason"
-                @click="showApproveContractDialog(scope.row)"
+                v-if="scope.row.reason&&scope.row.approveUserName!=userStore.name"
+                @click="replienishContractInfo(scope.row)"
                 v-hasPermi="['tienchin:contract:approve']"
             >补充合同信息
             </el-button>
@@ -184,6 +184,7 @@
         <el-table-column label="课程名称" align="center" :show-overflow-tooltip="true" width="120" prop="courseName"/>
         <el-table-column label="合同金额" align="center" :show-overflow-tooltip="true" width="120"
                          prop="contractPrice"/>
+        <el-table-column label="备注信息" align="center" :show-overflow-tooltip="true" width="120" prop="reason"/>
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template #default="scope">
             <el-button
@@ -299,7 +300,7 @@
     </el-dialog>
     <!-- 添加或修改合同对话框 -->
     <el-dialog :title="title" v-model="open" width="700px" append-to-body>
-      <el-form ref="businessRef" :model="form" :rules="rules" label-width="80px">
+      <el-form ref="contractRef" :model="form" :rules="rules" label-width="80px">
         <el-row>
           <el-col :span="12">
             <el-form-item label="手机号码" prop="phone">
@@ -442,6 +443,7 @@
                 <el-button type="primary">选择合同原件</el-button>
                 <template #tip>
                   <div class="el-upload__tip">
+                    <div>{{ old_file }}</div>
                     合同原件大小不能超过 5MB.
                   </div>
                 </template>
@@ -520,6 +522,7 @@ import {
   getContractDetailsById,
   approveOrReject,
   getPdfFile,
+  updateContractInfo,
   getCurrentApprovedTask,
   getCurrentUserUnapproveTask,
   getCurrentUserCommittedTask
@@ -559,6 +562,7 @@ const single = ref(true);
 const multiple = ref(true);
 const total = ref(0);
 const title = ref("");
+const old_file = ref("");
 const pdfSource = ref("");
 const headersObj = ref({
   "Authorization": 'Bearer ' + getToken()
@@ -593,6 +597,18 @@ const data = reactive({
 
 const {queryParams, form, assignForm, rules, assignFormRules} = toRefs(data);
 
+function replienishContractInfo(data) {
+  initDeptOptions();
+  getContractDetailsById(data.contractId).then(response => {
+    open.value = true;
+    form.value = response.data;
+    old_file.value = response.data.filePath.split("/tienchin/contract/views/")[1];
+    form.value.departmentId = response.data.approveDeptId;
+    initUsers();
+    title.value = '修改合同'
+  });
+}
+
 function handleApproveContract(approve) {
   approveInfo.value.approve = approve;
   if (!approve) {
@@ -600,6 +616,11 @@ function handleApproveContract(approve) {
     if (!approveInfo.value.reason) {
       proxy.$message.error('请输入拒绝理由')
       return;
+    }
+  } else {
+    //如果审批通过，但是用户却没有设置通过原因，则设置默认的原因为快速审批
+    if (!approveInfo.value.reason) {
+      approveInfo.value.reason = '快速审批';
     }
   }
   approveOrReject(approveInfo.value).then(response => {
@@ -803,7 +824,7 @@ function reset() {
     filePath: undefined,
     contractPrice: undefined
   };
-  proxy.resetForm("businessRef");
+  proxy.resetForm("contractRef");
 }
 
 /** 搜索按钮操作 */
@@ -854,13 +875,14 @@ function handleUpdate() {
 
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["businessRef"].validate(valid => {
+  proxy.$refs["contractRef"].validate(valid => {
     if (valid) {
-      if (form.value.businessId != undefined) {
-        updateBusiness(form.value).then(response => {
+      if (form.value.contractId != undefined) {
+        updateContractInfo(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getUnapproveTaskList();
+          getCurrentUserCommittedTask();
         });
       } else {
         addContract(form.value).then(response => {
@@ -868,6 +890,7 @@ function submitForm() {
           open.value = false;
           getUnapproveTaskList();
           getCurrentUserCommittedTask();
+          getCurrentApprovedTask();
         });
       }
     }
@@ -917,6 +940,7 @@ handleCommittedTask();
 getUnapproveTaskList();
 
 handleApprovedTask();
+
 </script>
 <style>
 .el-table .red-bg {

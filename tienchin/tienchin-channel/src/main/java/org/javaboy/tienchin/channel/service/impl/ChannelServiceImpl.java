@@ -8,6 +8,7 @@ import org.javaboy.tienchin.channel.domain.vo.ChannelVO;
 import org.javaboy.tienchin.channel.mapper.ChannelMapper;
 import org.javaboy.tienchin.channel.service.IChannelService;
 import org.javaboy.tienchin.common.core.domain.AjaxResult;
+import org.javaboy.tienchin.common.core.domain.model.PieData;
 import org.javaboy.tienchin.common.utils.SecurityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +94,16 @@ public class ChannelServiceImpl extends ServiceImpl<ChannelMapper, Channel> impl
             }).collect(Collectors.toList());
             return saveBatch(channels);
         }
+    }
+
+    @Override
+    public AjaxResult channelAnalysisData(ChannelVO channelVO) {
+        if (channelVO.getParams().get("beginTime")==null||channelVO.getParams().get("endTime")==null) {
+            channelVO.getParams().put("beginTime", LocalDateTime.now().minusWeeks(1));
+            channelVO.getParams().put("endTime", LocalDateTime.now().plusWeeks(1));
+        }
+        List<PieData> list = channelMapper.channelAnalysisData(channelVO);
+        return AjaxResult.success(list);
     }
 
 }

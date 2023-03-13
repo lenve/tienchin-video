@@ -10,6 +10,16 @@ public class ContractSummary {
     private String channelName;
     private String activityName;
 
+    private String approveUserName;
+
+    public String getApproveUserName() {
+        return approveUserName;
+    }
+
+    public void setApproveUserName(String approveUserName) {
+        this.approveUserName = approveUserName;
+    }
+
     private String reason;
 
     public String getReason() {

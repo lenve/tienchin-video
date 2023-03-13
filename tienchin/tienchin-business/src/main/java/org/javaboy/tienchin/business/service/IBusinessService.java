@@ -34,4 +34,5 @@ public interface IBusinessService extends IService<Business> {
 
     AjaxResult deleteBusinessById(Integer[] businessIds);
 
+    AjaxResult businessAnalysisData(BusinessVO businessVO);
 }

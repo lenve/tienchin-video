@@ -39,4 +39,6 @@ public interface IContractService extends IService<Contract> {
     AjaxResult approveOrReject(ContractApproveInfo contractApproveInfo);
 
     List<ContractSummary> approvedTask();
+
+    AjaxResult updateContract(Contract contract);
 }

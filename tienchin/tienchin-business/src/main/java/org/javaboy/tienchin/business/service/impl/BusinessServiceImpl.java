@@ -14,6 +14,8 @@ import org.javaboy.tienchin.business.service.IBusinessService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.javaboy.tienchin.common.constant.TienChinConstants;
 import org.javaboy.tienchin.common.core.domain.AjaxResult;
+import org.javaboy.tienchin.common.core.domain.model.EchartsPoint;
+import org.javaboy.tienchin.common.core.domain.model.LineChartData;
 import org.javaboy.tienchin.common.utils.SecurityUtils;
 import org.javaboy.tienchin.follow.domain.FollowRecord;
 import org.javaboy.tienchin.follow.service.IFollowRecordService;
@@ -123,5 +125,19 @@ public class BusinessServiceImpl extends ServiceImpl<BusinessMapper, Business> i
         UpdateWrapper<Business> uw = new UpdateWrapper<>();
         uw.lambda().set(Business::getDelFlag, 1).in(Business::getBusinessId, businessIds);
         return update(uw) ? AjaxResult.success("删除成功") : AjaxResult.error("删除失败");
+    }
+
+    @Override
+    public AjaxResult businessAnalysisData(BusinessVO businessVO) {
+        if (businessVO.getParams().get("beginTime")==null||businessVO.getParams().get("endTime")==null) {
+            businessVO.getParams().put("beginTime", LocalDateTime.now().minusWeeks(1));
+            businessVO.getParams().put("endTime", LocalDateTime.now().plusWeeks(1));
+        }
+        List<EchartsPoint> increaseBusiness = businessMapper.increaseBusiness(businessVO);
+        List<EchartsPoint> totalBusiness = businessMapper.totalBusiness(businessVO);
+        LineChartData lineChartData = new LineChartData();
+        lineChartData.setIncrease(increaseBusiness);
+        lineChartData.setTotal(totalBusiness);
+        return AjaxResult.success(lineChartData);
     }
 }

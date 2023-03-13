@@ -275,4 +275,24 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         }
         return result;
     }
+
+    @Override
+    public AjaxResult updateContract(Contract contract) {
+        //1. 向合同表中更新数据
+        //设置通用属性
+        contract.setUpdateBy(SecurityUtils.getUsername());
+        contract.setUpdateTime(LocalDateTime.now());
+        contract.setStatus(TienChinConstants.CONTRACT_UNAPPROVE);
+        updateById(contract);
+        //2。 提交流程
+        //启动流程
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("currentUser", SecurityUtils.getUsername());
+        vars.put("contractId", contract.getContractId());
+        vars.put("approveUser", contract.getApproveUserName());
+        vars.put("approveUserId", contract.getApproveUserId());
+        Task task = taskService.createTaskQuery().processInstanceId(contract.getProcessInstanceId()).active().singleResult();
+        taskService.complete(task.getId(), vars);
+        return AjaxResult.success("提交成功");
+    }
 }

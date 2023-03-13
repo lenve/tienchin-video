@@ -122,6 +122,16 @@ export function updateBusiness(data) {
 }
 
 
+// 更新商机
+export function updateContractInfo(data) {
+    return request({
+        url: '/tienchin/contract',
+        method: 'put',
+        data: data
+    })
+}
+
+
 // 根据商机的 ID 查询商机的摘要信息
 export function getBusinessSummaryById(businessId) {
     return request({
